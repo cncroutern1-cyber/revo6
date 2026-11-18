@@ -1,5 +1,6 @@
-Bu papkaga videolarni qo'ying (aynan shu nomlar bilan, MP4/H.264, ovozsiz, 720p, har biri 8 MB dan kichik):
-  rover-eshik.mp4         - rover stanogida eshik tayyorlash (Rover xizmati sahifasi foni)
-  gul-oyish.mp4           - gul / naqsh o'yish (Mahsulotlar va Rover sahifalari)
+Saytdagi video fonlar (MP4, ovozsiz, takrorlanadi). Haqiqiy stanok videosi bilan almashtirish uchun
+shu nomdagi faylni almashtiring (720p, 8 MB gacha):
+  rover-eshik.mp4         - eshik tayyorlash (Rover xizmati foni va "Ish jarayoni")
+  gul-oyish.mp4           - gul o'yish (Mahsulotlar va Rover sahifalari)
   shirma-tayyorlash.mp4   - shirma tayyorlash (Bosh sahifa va Rover sahifasi)
-Fayl bo'lmasa, sayt uni ko'rsatmaydi va hech qanday xato chiqmaydi.
+Hozirgi videolar Rover (CNC) o'yish jarayonining animatsiyasi.
