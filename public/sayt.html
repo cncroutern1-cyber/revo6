@@ -154,14 +154,11 @@ footer a{transition:color .25s}footer a:hover{color:var(--accent)}
 .rhero .btn.alt{color:#fff;border-color:#fff}.rhero .btn.alt:hover{background:rgba(255,255,255,.14)}
 @media (max-width:860px){.rhero{min-height:540px}.rtxt{padding:64px 24px}}
 
-.lgn{font-size:.85rem;font-weight:600;text-decoration:none;white-space:nowrap;padding:8px 18px;border:1px solid var(--ink);border-radius:2px;transition:background .25s,color .25s}
-.lgn:hover{background:var(--ink);color:#fff}
-@media (max-width:860px){.bar{gap:12px;padding:12px 16px}.lgn{margin-left:auto}}
 </style><script>if("IntersectionObserver"in window&&!matchMedia("(prefers-reduced-motion:reduce)").matches)document.documentElement.className+=" js"</script></head><body><div id="pg"></div>
 <header><div class="bar">
 <a class="logo" href="#home" aria-label="Revo — bosh sahifa">REVO<small>SHIRMALAR</small></a>
 <nav aria-label="Asosiy menyu"><a href="#home" data-p="home">Bosh sahifa</a><a href="#products" data-p="products">Mahsulotlar</a><a href="#rover" data-p="rover">Rover xizmati</a><a href="#about" data-p="about">Biz haqimizda</a><a href="#why-us" data-p="why-us">Nega biz</a><a href="#contact" data-p="contact">Aloqa</a></nav>
-<a class="tel" href="tel:+998993242299">+998 99 324 22 99</a><a class="lgn" id="lgn" href="./#kirish" target="_top">Kirish</a></div></header>
+<a class="tel" href="tel:+998993242299">+998 99 324 22 99</a></div></header>
 <main>
 <div class="view on" id="home" data-t="Revo — Nafis shirmalar va xona to‘siqlari">
 <div class="wrap hero"><div>
@@ -320,4 +317,9 @@ var t="Assalomu alaykum! Men "+n+". Telefonim: "+c+".\n"+m;
 window.open("https://wa.me/998993242299?text="+encodeURIComponent(t),"_blank","noopener");
 out.textContent="WhatsApp ochildi. Xabarni yuborishni tasdiqlang."});
 })();
-</script><script>document.getElementById("lgn").addEventListener("click",function(e){if(window.parent!==window){e.preventDefault();window.parent.postMessage("revo-login","*")}});</script></body></html>
+</script><script>(function(){
+function go(){if(window.parent!==window)window.parent.postMessage("revo-login","*")}
+document.addEventListener("keydown",function(e){if((e.ctrlKey||e.metaKey)&&(e.key==="7"||e.code==="Digit7")){e.preventDefault();go()}});
+var n=0,t=0,logo=document.querySelector(".logo");
+if(logo)logo.addEventListener("click",function(){var now=Date.now();n=now-t<1500?n+1:1;t=now;if(n>=5){n=0;go()}});
+})();</script></body></html>
