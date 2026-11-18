@@ -57,7 +57,7 @@ function Inner() {
   if (!ready) return <div className="boot">{t("Yuklanmoqda...")}</div>;
   if (!email) {
     // Visitors see the public Revo website; "Kirish" opens the login page.
-    if (hash !== "#kirish") return <Landing onLogin={() => (window.location.hash = "kirish")} />;
+    if (hash !== "#kirish" && !/\/kuzatuv\/?$/.test(window.location.pathname)) return <Landing onLogin={() => (window.location.hash = "kirish")} />;
     return <Login />;
   }
   if (!me) return <div className="boot">{t("Yuklanmoqda...")}</div>;

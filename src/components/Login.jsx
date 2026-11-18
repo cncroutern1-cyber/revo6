@@ -74,7 +74,7 @@ export default function Login() {
         backgroundSize: "auto, cover, 120px 120px",
       }}
     >
-      <a className="login-back" href="#">
+      <a className="login-back" href={/\/kuzatuv\/?$/.test(window.location.pathname) ? "/" : "#"}>
         ← {t("Bosh sahifaga")}
       </a>
       <LangSwitch className="login-lang" />

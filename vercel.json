@@ -1,0 +1,4 @@
+{
+  "redirects": [{ "source": "/kuzatuv/", "destination": "/kuzatuv", "permanent": false }],
+  "rewrites": [{ "source": "/kuzatuv", "destination": "/index.html" }]
+}
