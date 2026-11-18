@@ -187,6 +187,12 @@ input.bad,textarea.bad{border-color:#A5301F}
 #home{position:relative}
 .herobg{position:absolute;left:0;right:0;top:0;height:min(820px,100%);background:#fbf8f2 url(img/hero-bg.jpg) right top/cover no-repeat;z-index:-1;pointer-events:none}
 @media(max-width:700px){.herobg{background-position:70% top;opacity:.85}}
+.mapbox{margin-top:18px}
+.mapbox h3{margin:0 0 10px;font-size:1.05rem}
+.mapframe{border:1px solid var(--line,#e5e0d6);border-radius:12px;overflow:hidden;background:#f4efe6}
+.mapframe iframe{display:block;width:100%;height:320px;border:0}
+.mapbox .btn{margin-top:12px}
+@media(max-width:700px){.mapframe iframe{height:260px}}
 </style><script>if("IntersectionObserver"in window&&!matchMedia("(prefers-reduced-motion:reduce)").matches)document.documentElement.className+=" js"</script></head><body><div id="pg"></div>
 <header><div class="bar">
 <a class="logo" href="#home" aria-label="Revo — bosh sahifa">REVO<small>SHIRMALAR</small></a>
@@ -287,6 +293,7 @@ input.bad,textarea.bad{border-color:#A5301F}
 <a class="cc" href="https://wa.me/998993242299" target="_blank" rel="noopener"><span class="ci"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.5 8.5 0 01-12.6 7.4L3 20.5l1.7-5.2A8.5 8.5 0 1121 11.5z"/><path d="M9 8.5c0 3 2.5 5.5 5.5 5.5l1-1.2-1.7-1-.8.7a3.5 3.5 0 01-1.7-1.7l.7-.8-1-1.7z"/></svg></span><span><b>WhatsApp</b><small>Xabar yozing</small></span></a>
 <a class="cc" href="https://t.me/+998993242299" target="_blank" rel="noopener"><span class="ci"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 3L2 11l6 2.2L10 20l3.3-4.3L18 19.5z"/><path d="M8 13.2L22 3"/></svg></span><span><b>Telegram</b><small>Xabar yozing</small></span></a>
 </div>
+<div class="mapbox"><h3>Manzilimiz</h3><div class="mapframe"><iframe src="https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d618.0499346371236!2d69.2560755143883!3d41.356563538927404!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e1!3m2!1suz!2s!4v1795027498228!5m2!1suz!2s" title="Revo shirmalar manzili xaritada" loading="lazy" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe></div><a class="btn alt sm" href="https://www.google.com/maps?q=41.356563538927404,69.2560755143883" target="_blank" rel="noopener">Xaritada ochish</a></div>
 <button type="button" class="btn alt cpy" id="cpy">Raqamni nusxalash</button>
 <div class="tips"><h3>Buyurtma uchun yozib yuboring</h3>
 <ul><li>Qaysi model yoki chizma kerak</li><li>Taxminiy o‘lcham (balandlik va kenglik)</li><li>Rang va naqsh bo‘yicha xohishingiz</li><li>Qachongacha tayyor bo‘lishi kerak</li></ul>
