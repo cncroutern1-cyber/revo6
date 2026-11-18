@@ -1,8 +1,9 @@
 import { useState } from "react";
 import Modal from "./Modal.jsx";
-import { STAGE_NAMES, uid, todayStr, resizeImg, fmt, fmtArea } from "../utils.js";
+import { STAGE_NAMES, uid, todayStr, resizeImg, fmt, fmtArea, COLORS } from "../utils.js";
 import { useT } from "../i18n.jsx";
 import { downloadJobPdf } from "../pdf.js";
+import { sb } from "../supabase.js";
 
 const MATERIALS = ["LDSP", "MDF", "Massiv", "Fanera"];
 
@@ -19,6 +20,9 @@ export default function JobForm({ job, isAdmin, customers, onSave, onDelete, onC
     dims: job?.dims || "",
     price: job?.price || "",
     rate: job?.rate || "",
+    color: job?.color || "",
+    fileName: job?.fileName || "",
+    filePath: job?.filePath || "",
     matOurs: !!job?.matOurs,
     matPrice: job?.matPrice || "",
     advance: job?.advance || "",
@@ -46,6 +50,20 @@ export default function JobForm({ job, isAdmin, customers, onSave, onDelete, onC
     const v = e.target.value;
     const c = customers[v.trim()];
     setF((s) => ({ ...s, customer: v, phone: c && c.phone && !s.phone ? c.phone : s.phone }));
+  }
+
+  const [up, setUp] = useState("");
+  async function pickFile(e) {
+    const file = e.target.files[0];
+    e.target.value = "";
+    if (!file) return;
+    if (file.size > 20 * 1024 * 1024) return setUp(t("Fayl 20 MB dan katta"));
+    setUp(t("Yuklanmoqda..."));
+    const path = uid() + "-" + file.name.replace(/[^\w.\-]+/g, "_");
+    const { error } = await sb.storage.from("job-files").upload(path, file);
+    if (error) return setUp(t("Yuklab bo'lmadi") + ": " + error.message);
+    setUp("");
+    setF((s) => ({ ...s, fileName: file.name, filePath: path }));
   }
 
   async function pickImg(e) {
@@ -79,6 +97,9 @@ export default function JobForm({ job, isAdmin, customers, onSave, onDelete, onC
       material: f.material.trim(),
       thick: String(f.thick || ""),
       dims: f.dims.trim(),
+      color: hasMat ? f.color.trim() : "",
+      fileName: f.fileName,
+      filePath: f.filePath,
       due: f.due,
       note: f.note.trim(),
       img: f.img,
@@ -143,6 +164,20 @@ export default function JobForm({ job, isAdmin, customers, onSave, onDelete, onC
           <input id="fThick" type="number" min="0" value={f.thick} onChange={set("thick")} placeholder="18" />
         </div>
       </div>
+      {hasMat && (
+        <div className="f">
+          <label htmlFor="fColor">{t("Rangi")}</label>
+          <div className="swatches">
+            {COLORS.map(([n, hex]) => (
+              <button type="button" key={n} className={"sw" + (f.color === n ? " on" : "")} onClick={() => setF((s) => ({ ...s, color: s.color === n ? "" : n }))} title={t(n)} aria-label={t(n)} aria-pressed={f.color === n}>
+                <i style={{ background: hex }} />
+                {t(n)}
+              </button>
+            ))}
+          </div>
+          <input id="fColor" type="text" value={f.color} onChange={set("color")} placeholder={t("Yoki rangni o'zingiz yozing")} />
+        </div>
+      )}
       <div className="f">
         <label htmlFor="fDims">{t("O'lcham")}</label>
         <input id="fDims" type="text" value={f.dims} onChange={set("dims")} placeholder={t("Masalan: 2100×600")} />
@@ -225,6 +260,22 @@ export default function JobForm({ job, isAdmin, customers, onSave, onDelete, onC
       <div className="f">
         <label htmlFor="fNote">{t("Izoh")}</label>
         <textarea id="fNote" value={f.note} onChange={set("note")} placeholder={t("Qo'shimcha eslatma")} />
+      </div>
+      <div className="f">
+        <label htmlFor="fFile">{t("Fayl biriktirish")}</label>
+        <div className="imgrow">
+          <label className="btn small" htmlFor="fFile" style={{ cursor: "pointer" }}>
+            {t("Fayl tanlash")}
+          </label>
+          <input id="fFile" type="file" onChange={pickFile} style={{ display: "none" }} />
+          {f.fileName && <span className="fname">📎 {f.fileName}</span>}
+          {f.fileName && (
+            <button type="button" className="btn small danger" onClick={() => setF((s) => ({ ...s, fileName: "", filePath: "" }))}>
+              {t("Olib tashlash")}
+            </button>
+          )}
+        </div>
+        {up && <div className="meta">{up}</div>}
       </div>
       <div className="f">
         <label htmlFor="fImg">{t("Rasm / chizma")}</label>

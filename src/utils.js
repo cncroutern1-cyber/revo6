@@ -28,6 +28,17 @@ export const daysLeft = (due) =>
 export const payState = (j) =>
   j.price > 0 ? (j.advance >= j.price ? 2 : j.advance > 0 ? 1 : 0) : j.advance > 0 ? 1 : 0;
 
+export const COLORS = [
+  ["Oq", "#f5f5f2"],
+  ["Krem", "#efe3c8"],
+  ["Bej", "#d9c3a0"],
+  ["Tabiiy yog'och", "#c99a62"],
+  ["Jigarrang", "#6b4226"],
+  ["Qora", "#1a1a1a"],
+  ["Kul rang", "#9aa0a6"],
+  ["Oltin", "#c9a227"],
+];
+
 export const fmtArea = (n) => String(Math.round((n || 0) * 100) / 100);
 
 export const debtOf = (j) => Math.max(0, (j.price || 0) - (j.advance || 0));
@@ -56,6 +67,8 @@ export function toRow(j) {
     // "area" is written only when the column exists in the database (or a value is entered), so older databases keep working.
     ...(j.area > 0 || j.hadArea ? { area: j.area || 0 } : {}),
     // New optional columns: rate (so'm per m²), mat_ours (material supplied by us), mat_price. Same rule as "area".
+    ...(j.color || j.hadColor ? { color: j.color || "" } : {}),
+    ...(j.filePath || j.hadFile ? { file_name: j.fileName || "", file_path: j.filePath || "" } : {}),
     ...(j.rate > 0 || j.hadRate ? { rate: j.rate || 0 } : {}),
     ...(j.matOurs || j.hadMat ? { mat_ours: !!j.matOurs } : {}),
     ...(j.matPrice > 0 || j.hadMat ? { mat_price: j.matPrice || 0 } : {}),
@@ -72,6 +85,11 @@ export function fromRow(r) {
     pos: Number(r.pos),
     area: Number(r.area) || 0,
     hadArea: "area" in r,
+    color: r.color || "",
+    hadColor: "color" in r,
+    fileName: r.file_name || "",
+    filePath: r.file_path || "",
+    hadFile: "file_path" in r,
     rate: Number(r.rate) || 0,
     hadRate: "rate" in r,
     matOurs: !!r.mat_ours,

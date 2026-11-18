@@ -1,3 +1,4 @@
+import { sb } from "../supabase.js";
 import { PAYN, fmt, fmtArea, daysLeft, payState, debtOf } from "../utils.js";
 import Icon from "./Icons.jsx";
 import { useT } from "../i18n.jsx";
@@ -30,7 +31,7 @@ export default function Card({ j, idx, count, sortByDue, isAdmin, act }) {
       );
   }
 
-  const meta = [j.material, j.thick ? j.thick + " mm" : "", j.dims].filter(Boolean).join(" · ");
+  const meta = [j.material, j.color ? t(j.color) : "", j.thick ? j.thick + " mm" : "", j.dims].filter(Boolean).join(" · ");
 
   return (
     <div className={"card" + (late ? " late" : "")}>
@@ -52,6 +53,11 @@ export default function Card({ j, idx, count, sortByDue, isAdmin, act }) {
       </div>
       {meta && <div className="meta">{meta}</div>}
       {j.note && <div className="meta">{j.note}</div>}
+      {j.filePath && (
+        <a className="meta filelink" href={sb.storage.from("job-files").getPublicUrl(j.filePath).data.publicUrl} target="_blank" rel="noreferrer">
+          📎 {j.fileName || t("Fayl")}
+        </a>
+      )}
       {(dueChip || moneyChip) && (
         <div className="chips">
           {dueChip}

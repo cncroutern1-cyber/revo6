@@ -119,10 +119,12 @@ export async function downloadJobPdf(j, { t, isAdmin, phone }) {
   row(t("Detallar soni"), j.parts);
   row(t("Detallar kvadrati (m²)"), j.area > 0 ? fmtArea(j.area) : "");
   row(t("Material"), [j.material, j.thick ? j.thick + " mm" : ""].filter(Boolean).join(", ") + (j.matOurs ? ` (${t("bizdan")})` : ""));
+  row(t("Rangi"), j.color ? t(j.color) : "");
   row(t("O'lcham"), j.dims);
   row(t("Topshirish muddati"), j.due);
   row(t("Bosqich"), t(STAGE_NAMES[j.stage] || ""));
   row(t("Izoh"), j.note);
+  row(t("Fayl"), j.fileName);
 
   if (isAdmin) {
     y += 36;
