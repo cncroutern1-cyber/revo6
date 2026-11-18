@@ -63,6 +63,22 @@ export function useData() {
     return true;
   };
 
+  // If the "area" column has not been added to Supabase yet, save without it instead of losing the job.
+  const upsertJobs = async (rows) => {
+    let r = await sb.from("jobs").upsert(rows);
+    if (r.error && /area/i.test(r.error.message || "")) {
+      const strip = (x) => {
+        const { area, ...rest } = x;
+        return rest;
+      };
+      r = await sb.from("jobs").upsert(Array.isArray(rows) ? rows.map(strip) : strip(rows));
+      if (!r.error) {
+        console.warn("jobs.area ustuni yo'q — supabase-yangilash-area.sql ni ishga tushiring");
+      }
+    }
+    return r;
+  };
+
   const saveJob = (j) => {
     setJobs((list) => {
       const i = list.findIndex((x) => x.id === j.id);
@@ -73,7 +89,7 @@ export function useData() {
       }
       return sortJobs([...list, j]);
     });
-    return run(sb.from("jobs").upsert(toRow(j)));
+    return run(upsertJobs(toRow(j)));
   };
 
   const removeJob = (id) => {
@@ -103,7 +119,7 @@ export function useData() {
     const a = { ...j, pos: po };
     const b = { ...o, pos: pj };
     setJobs((list) => sortJobs(list.map((x) => (x.id === a.id ? a : x.id === b.id ? b : x))));
-    run(sb.from("jobs").upsert([toRow(a), toRow(b)]));
+    run(upsertJobs([toRow(a), toRow(b)]));
   };
 
   const restore = async (d) => {
@@ -118,7 +134,7 @@ export function useData() {
     );
     setStatus({ text: "Yuklanmoqda...", err: false });
     for (let i = 0; i < rows.length; i += 20) {
-      if (!(await run(sb.from("jobs").upsert(rows.slice(i, i + 20))))) return;
+      if (!(await run(upsertJobs(rows.slice(i, i + 20))))) return;
     }
     const crows = Object.keys(d.customers || {}).map((n) => ({
       name: n,
