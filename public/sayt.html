@@ -184,6 +184,9 @@ input.bad,textarea.bad{border-color:#A5301F}
 .tips p{margin:0;font-size:.9rem}
 .split>div{min-width:0}.cc>span:last-child{min-width:0}.cpy{max-width:100%}
 @media (max-width:860px){.split{grid-template-columns:minmax(0,1fr)}}
+#home{position:relative}
+.herobg{position:absolute;left:0;right:0;top:0;height:min(820px,100%);background:#fbf8f2 url(img/hero-bg.jpg) right top/cover no-repeat;z-index:-1;pointer-events:none}
+@media(max-width:700px){.herobg{background-position:70% top;opacity:.85}}
 </style><script>if("IntersectionObserver"in window&&!matchMedia("(prefers-reduced-motion:reduce)").matches)document.documentElement.className+=" js"</script></head><body><div id="pg"></div>
 <header><div class="bar">
 <a class="logo" href="#home" aria-label="Revo — bosh sahifa">REVO<small>SHIRMALAR</small></a>
@@ -191,6 +194,7 @@ input.bad,textarea.bad{border-color:#A5301F}
 <a class="tel" href="tel:+998993242299">+998 99 324 22 99</a></div></header>
 <main>
 <div class="view on" id="home" data-t="Revo — Nafis shirmalar va xona to‘siqlari">
+<div class="herobg" aria-hidden="true"></div>
 <div class="wrap hero"><div>
 <span class="eyebrow" data-aos="fade-up" data-aos-delay="0">Shirmalar va xona to‘siqlari</span>
 <h1 data-aos="fade-up" data-aos-delay="120">Xonangizga nafislik va tartib olib keladigan shirmalar</h1>
