@@ -167,6 +167,23 @@ footer a{transition:color .25s}footer a:hover{color:var(--accent)}
 .vt::after{content:"";position:absolute;inset:0;background:linear-gradient(0deg,rgba(14,11,9,.8),transparent 55%)}
 .vt figcaption{position:absolute;left:18px;right:18px;bottom:16px;z-index:2;font-family:"Cormorant Garamond",Georgia,serif;font-size:1.35rem;font-weight:600;line-height:1.15}
 @media (prefers-reduced-motion:reduce){.bgv{display:none}}
+
+select{font:inherit;font-size:1rem;text-transform:none;letter-spacing:0;font-weight:400;padding:13px 14px;border:1px solid #CFC9BE;border-radius:2px;background:#fff;color:var(--ink)}
+.ferr{min-height:1.1em;color:#A5301F;font-size:.8rem;font-weight:500;text-transform:none;letter-spacing:0}
+input.bad,textarea.bad{border-color:#A5301F}
+#msg.okmsg{color:#2F6B3A}
+.ccards{display:grid;gap:12px;margin-top:6px}
+.cc{display:flex;align-items:center;gap:16px;padding:16px 18px;background:#fff;border:1px solid var(--line);border-radius:6px;text-decoration:none;transition:transform .3s,box-shadow .3s,border-color .3s}
+.cc:hover{transform:translateY(-3px);box-shadow:0 14px 30px rgba(23,24,26,.1);border-color:var(--accent)}
+.ci{flex:none;width:46px;height:46px;border-radius:50%;display:grid;place-items:center;background:var(--alt);color:var(--accent)}
+.cc b{display:block;font-size:1rem}.cc small{display:block;color:var(--muted);font-size:.9rem}
+.cpy{margin-top:14px}
+.tips{margin-top:30px;padding:24px;background:var(--alt);border-radius:6px}
+.tips h3{font-family:Inter,system-ui,sans-serif;font-size:1rem;font-weight:700;letter-spacing:0;margin:0 0 .6em}
+.tips ul{margin:0 0 .8em;padding-left:1.2em;color:var(--muted)}.tips li{margin:.25em 0}
+.tips p{margin:0;font-size:.9rem}
+.split>div{min-width:0}.cc>span:last-child{min-width:0}.cpy{max-width:100%}
+@media (max-width:860px){.split{grid-template-columns:minmax(0,1fr)}}
 </style><script>if("IntersectionObserver"in window&&!matchMedia("(prefers-reduced-motion:reduce)").matches)document.documentElement.className+=" js"</script></head><body><div id="pg"></div>
 <header><div class="bar">
 <a class="logo" href="#home" aria-label="Revo — bosh sahifa">REVO<small>SHIRMALAR</small></a>
@@ -239,15 +256,25 @@ footer a{transition:color .25s}footer a:hover{color:var(--accent)}
 
 <div class="view" id="contact" data-t="Aloqa — Revo"><div class="wrap page"><div class="split">
 <div data-aos="fade-right" data-aos-delay="0"><span class="eyebrow">Aloqa</span><h1 style="font-size:clamp(2.2rem,4.5vw,3.4rem)">Biz bilan bog‘laning</h1>
-<p class="lead">Buyurtma yoki savol uchun qo‘ng‘iroq qiling yoki xabar qoldiring.</p>
+<p class="lead">Buyurtma yoki savol uchun qo‘ng‘iroq qiling yoki xabar qoldiring. Xabaringiz WhatsApp orqali bizga yetib boradi.</p>
 <form id="f" novalidate>
-<label>Ismingiz<input id="n" autocomplete="name" placeholder="Ism va familiya"></label>
-<label>Telefon raqamingiz<input id="c" type="tel" autocomplete="tel" placeholder="+998 90 123 45 67"></label>
-<label>Xabaringiz<textarea id="m" placeholder="Qaysi shirma kerak? O‘lcham va rangini yozing."></textarea></label>
+<label>Murojaat turi<select id="t"><option>Shirma buyurtma qilish</option><option>Rover (CNC) xizmati</option><option>Boshqa savol</option></select></label>
+<label>Ismingiz<input id="n" autocomplete="name" placeholder="Ism va familiya"><span class="ferr" id="en" role="alert"></span></label>
+<label>Telefon raqamingiz<input id="c" type="tel" inputmode="tel" autocomplete="tel" placeholder="+998 90 123 45 67"><span class="ferr" id="ec" role="alert"></span></label>
+<label>Xabaringiz<textarea id="m" placeholder="Qaysi shirma kerak? O‘lcham va rangini yozing."></textarea><span class="ferr" id="em" role="alert"></span></label>
 <div><button type="button" class="btn" id="s">WhatsApp orqali yuborish</button></div>
 <p id="msg" role="status"></p></form></div>
-<div data-aos="fade-left" data-aos-delay="150"><dl><dt>Telefon</dt><dd><a href="tel:+998993242299">+998 99 324 22 99</a></dd></dl>
-<div class="row"><a class="btn alt" href="tel:+998993242299">Qo‘ng‘iroq qilish</a></div></div></div></div></div>
+<div data-aos="fade-left" data-aos-delay="150">
+<div class="ccards">
+<a class="cc" href="tel:+998993242299"><span class="ci"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.9v3a2 2 0 01-2.2 2 19.8 19.8 0 01-8.6-3.1 19.5 19.5 0 01-6-6A19.8 19.8 0 012.1 4.2 2 2 0 014.1 2h3a2 2 0 012 1.7c.1 1 .4 1.9.7 2.8a2 2 0 01-.5 2.1L8.1 9.9a16 16 0 006 6l1.3-1.3a2 2 0 012.1-.4c.9.3 1.8.6 2.8.7a2 2 0 011.7 2z"/></svg></span><span><b>Qo‘ng‘iroq qilish</b><small>+998 99 324 22 99</small></span></a>
+<a class="cc" href="https://wa.me/998993242299" target="_blank" rel="noopener"><span class="ci"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.5 8.5 0 01-12.6 7.4L3 20.5l1.7-5.2A8.5 8.5 0 1121 11.5z"/><path d="M9 8.5c0 3 2.5 5.5 5.5 5.5l1-1.2-1.7-1-.8.7a3.5 3.5 0 01-1.7-1.7l.7-.8-1-1.7z"/></svg></span><span><b>WhatsApp</b><small>Xabar yozing</small></span></a>
+<a class="cc" href="https://t.me/+998993242299" target="_blank" rel="noopener"><span class="ci"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 3L2 11l6 2.2L10 20l3.3-4.3L18 19.5z"/><path d="M8 13.2L22 3"/></svg></span><span><b>Telegram</b><small>Xabar yozing</small></span></a>
+</div>
+<button type="button" class="btn alt cpy" id="cpy">Raqamni nusxalash</button>
+<div class="tips"><h3>Buyurtma uchun yozib yuboring</h3>
+<ul><li>Qaysi model yoki chizma kerak</li><li>Taxminiy o‘lcham (balandlik va kenglik)</li><li>Rang va naqsh bo‘yicha xohishingiz</li><li>Qachongacha tayyor bo‘lishi kerak</li></ul>
+<p>Narx va tayyorlanish muddatini buyurtmadan oldin aniq kelishib olamiz.</p></div>
+</div></div></div></div>
 </main>
 <footer><div class="wrap"><span>© 2026 Revo. Barcha huquqlar himoyalangan.</span><a href="tel:+998993242299">+998 99 324 22 99</a></div></footer>
 <a class="fab call" href="tel:+998993242299" aria-label="Qo‘ng‘iroq qilish"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z"/></svg></a><button class="fab top" id="up" aria-label="Yuqoriga"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button>
@@ -325,12 +352,23 @@ document.querySelectorAll("nav a").forEach(function(a){if(a.dataset.p===h)a.setA
 window.scrollTo(0,0)}
 window.addEventListener("hashchange",function(){show()});show();
 document.addEventListener("click",function(e){var a=e.target.closest&&e.target.closest('a[href^="#"]');if(!a)return;var h=a.getAttribute("href").slice(1);if(pages.indexOf(h)<0)return;e.preventDefault();try{if(location.hash!=="#"+h)location.hash=h}catch(x){}show(h)});
-document.getElementById("s").addEventListener("click",function(){
-var n=document.getElementById("n").value.trim(),c=document.getElementById("c").value.trim(),m=document.getElementById("m").value.trim(),out=document.getElementById("msg");
-if(!n||!c||!m){out.textContent="Iltimos, barcha maydonlarni to‘ldiring.";return}
-var t="Assalomu alaykum! Men "+n+". Telefonim: "+c+".\n"+m;
+var $=function(i){return document.getElementById(i)};
+function setErr(id,fid,t){$(id).textContent=t;$(fid).classList.toggle("bad",!!t)}
+$("s").addEventListener("click",function(){
+var n=$("n").value.trim(),c=$("c").value.trim(),m=$("m").value.trim(),tp=$("t").value,out=$("msg"),bad=0;
+out.className="";out.textContent="";
+setErr("en","n",n.length<2?"Ismingizni kiriting.":"");
+setErr("ec","c",c.replace(/\D/g,"").length<9?"Telefon raqamini to‘liq kiriting.":"");
+setErr("em","m",m.length<5?"Xabaringizni yozing.":"");
+if(n.length<2||c.replace(/\D/g,"").length<9||m.length<5){out.textContent="Iltimos, belgilangan maydonlarni to‘ldiring.";return}
+var t="Assalomu alaykum! ["+tp+"]\nMen "+n+". Telefonim: "+c+".\n"+m;
 window.open("https://wa.me/998993242299?text="+encodeURIComponent(t),"_blank","noopener");
-out.textContent="WhatsApp ochildi. Xabarni yuborishni tasdiqlang."});
+out.className="okmsg";out.textContent="WhatsApp ochildi. Xabarni yuborishni tasdiqlang."});
+["n","c","m"].forEach(function(k){$(k).addEventListener("input",function(){setErr("e"+k,k,"")})});
+$("cpy").addEventListener("click",function(){var b=this,num="+998 99 324 22 99";
+function done(){b.textContent="Nusxalandi ✓";setTimeout(function(){b.textContent="Raqamni nusxalash"},1800)}
+try{navigator.clipboard.writeText(num).then(done,function(){b.textContent=num})}catch(e){b.textContent=num}});
+document.querySelectorAll(".pc .btn.sm").forEach(function(a){a.addEventListener("click",function(){var name=a.closest(".pc").querySelector("h3").textContent;$("t").value="Shirma buyurtma qilish";if(!$("m").value.trim())$("m").value="“"+name+"” modeliga buyurtma bermoqchiman. O‘lcham va rangi: "})})
 })();
 </script><script>(function(){
 function go(){if(window.parent!==window)window.parent.postMessage("revo-login","*")}
