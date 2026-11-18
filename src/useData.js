@@ -16,12 +16,18 @@ export function useData() {
   });
   const [status, setStatus] = useState({ text: "Yuklanmoqda...", err: false });
   const timer = useRef();
+  // A refresh that started before (or while) a change was being saved must not overwrite the screen with old data,
+  // otherwise a job that was just moved jumps back to its previous column.
+  const writes = useRef(0);
+  const epoch = useRef(0);
 
   const fetchAll = useCallback(async () => {
+    const ep = epoch.current;
     const [a, b] = await Promise.all([
       sb.from("jobs").select("*").order("pos", { ascending: true }),
       sb.from("customers").select("*"),
     ]);
+    if (writes.current > 0 || ep !== epoch.current) return; // stale snapshot: a change is being saved
     const error = a.error || b.error;
     if (error) {
       setStatus({ text: "Xato: " + error.message, err: true });
@@ -70,10 +76,22 @@ export function useData() {
   }, [fetchAll]);
 
   const run = async (promise) => {
-    const { error } = await promise;
+    writes.current++;
+    epoch.current++;
+    let error = null;
+    try {
+      ({ error } = await promise);
+    } catch (e) {
+      error = e;
+    }
+    writes.current--;
+    epoch.current++;
+    // Re-sync with the database once the write is done (on failure this also shows what was really saved).
+    clearTimeout(timer.current);
+    timer.current = setTimeout(fetchAll, error ? 100 : 600);
     if (error) {
       console.error(error);
-      setStatus({ text: "Xato: " + error.message, err: true });
+      setStatus({ text: "Xato: " + (error.message || error), err: true });
       return false;
     }
     setStatus({ text: "Saqlandi", err: false });
