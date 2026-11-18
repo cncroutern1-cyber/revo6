@@ -81,7 +81,7 @@ export function useData() {
   };
 
   // If an optional column (area, rate, mat_ours, mat_price) is not in Supabase yet, save without it instead of losing the job.
-  const OPTIONAL = ["area", "rate", "mat_ours", "mat_price", "color", "file_name", "file_path"];
+  const OPTIONAL = ["area", "rate", "mat_ours", "mat_price", "color", "file_name", "file_path", "price_mode", "lists"];
   const upsertJobs = async (rows) => {
     let cur = rows;
     for (let i = 0; i <= OPTIONAL.length; i++) {

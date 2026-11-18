@@ -129,7 +129,8 @@ export async function downloadJobPdf(j, { t, isAdmin, phone }) {
   if (isAdmin) {
     y += 36;
     const lines = [];
-    if (j.rate > 0 && j.area > 0) lines.push([`${t("Rover xizmati")}: ${fmtArea(j.area)} m² × ${fmt(j.rate)}`, fmt(j.area * j.rate)]);
+    if (j.priceMode === "list" && j.rate > 0) lines.push([`${t("Rover xizmati")}: ${fmt(j.lists)} ${t("list")} × ${fmt(j.rate)}`, fmt(j.lists * j.rate)]);
+    else if (j.rate > 0 && j.area > 0) lines.push([`${t("Rover xizmati")}: ${fmtArea(j.area)} m² × ${fmt(j.rate)}`, fmt(j.area * j.rate)]);
     if (j.matOurs && j.matPrice > 0) lines.push([`${t("Material")} (${t("bizdan")})`, fmt(j.matPrice)]);
     const rest = Math.max(0, (j.price || 0) - (j.advance || 0));
     const line = (a, b, bold) => {

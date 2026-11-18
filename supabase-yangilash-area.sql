@@ -21,3 +21,7 @@ create table if not exists public.materials (name text primary key, price numeri
 alter table public.materials enable row level security;
 drop policy if exists "materials_auth_all" on public.materials;
 create policy "materials_auth_all" on public.materials for all to authenticated using (true) with check (true);
+
+-- Xizmat narxi usuli (kvadrat / list)
+alter table public.jobs add column if not exists price_mode text default '';
+alter table public.jobs add column if not exists lists numeric default 0;

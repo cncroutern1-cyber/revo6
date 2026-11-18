@@ -9,6 +9,8 @@ const MATERIALS = ["LDSP", "MDF", "Massiv", "Fanera"];
 
 export default function JobForm({ job, isAdmin, customers, materialPrices = {}, onSaveMaterialPrice, onSave, onDelete, onClose }) {
   const t = useT();
+  // Older jobs may have only a typed-in price: they open in "manual" mode so the price is never lost.
+  const legacy = !!job && (job.price || 0) > 0 && !(job.rate > 0);
   const [f, setF] = useState({
     title: job?.title || "",
     customer: job?.customer || "",
@@ -17,12 +19,12 @@ export default function JobForm({ job, isAdmin, customers, materialPrices = {}, 
     area: job?.area || "",
     material: job?.material || "",
     thick: job?.thick || "",
-    dims: job?.dims || "",
-    price: job?.price || "",
-    rate: job?.rate || "",
     color: job?.color || "",
-    fileName: job?.fileName || "",
-    filePath: job?.filePath || "",
+    dims: job?.dims || "",
+    priceMode: legacy ? "manual" : job?.priceMode || "m2",
+    rate: job?.rate || "",
+    lists: job?.lists || "",
+    price: legacy ? job.price : "",
     matOurs: !!job?.matOurs,
     matPrice: job?.matPrice || "",
     matRate: "",
@@ -30,17 +32,19 @@ export default function JobForm({ job, isAdmin, customers, materialPrices = {}, 
     due: job?.due || "",
     stage: job ? job.stage : 0,
     note: job?.note || "",
+    fileName: job?.fileName || "",
+    filePath: job?.filePath || "",
     img: job?.img || null,
   });
   const set = (k) => (e) => setF((s) => ({ ...s, [k]: e.target.value }));
-
   const names = Object.keys(customers);
 
-  // Price minus advance, shown as soon as either is typed.
-  // Rover service = area × price per m² (if a rate is entered; otherwise the manual price). Material is added only when we supply it.
+  // --- Price: service (by m² or by sheet) + material (only if we supply it) - advance ---
   const areaN = parseFloat(f.area) || 0;
   const rateN = parseFloat(f.rate) || 0;
-  const service = rateN > 0 ? Math.round(areaN * rateN) : parseFloat(f.price) || 0;
+  const listsN = parseFloat(f.lists) || 0;
+  const mode = f.priceMode;
+  const service = mode === "m2" ? Math.round(areaN * rateN) : mode === "list" ? Math.round(listsN * rateN) : parseFloat(f.price) || 0;
   const hasMat = f.material.trim() !== "";
   const matKey = Object.keys(materialPrices).find((k) => k.toLowerCase() === f.material.trim().toLowerCase());
   const listRate = matKey ? materialPrices[matKey] : 0;
@@ -51,6 +55,7 @@ export default function JobForm({ job, isAdmin, customers, materialPrices = {}, 
   const priceN = service + matN;
   const advN = parseFloat(f.advance) || 0;
   const rest = priceN - advN;
+  const setMode = (m) => setF((s) => ({ ...s, priceMode: m }));
 
   function pickCustomer(e) {
     const v = e.target.value;
@@ -111,7 +116,9 @@ export default function JobForm({ job, isAdmin, customers, materialPrices = {}, 
       img: f.img,
     };
     if (isAdmin) {
-      j.rate = Math.max(0, rateN);
+      j.priceMode = mode;
+      j.rate = mode === "manual" ? 0 : Math.max(0, rateN);
+      j.lists = mode === "list" ? Math.max(0, listsN) : 0;
       j.matOurs = hasMat && !!f.matOurs;
       j.matPrice = j.matOurs ? Math.max(0, matCost) : 0;
       j.price = Math.max(0, priceN);
@@ -145,6 +152,8 @@ export default function JobForm({ job, isAdmin, customers, materialPrices = {}, 
           <input id="fPhone" type="tel" value={f.phone} onChange={set("phone")} placeholder="+998 90 123 45 67" />
         </div>
       </div>
+
+      <h4 className="fsec">{t("Detallar")}</h4>
       <div className="two">
         <div className="f">
           <label htmlFor="fParts">{t("Detallar soni")}</label>
@@ -155,9 +164,15 @@ export default function JobForm({ job, isAdmin, customers, materialPrices = {}, 
           <input id="fArea" type="number" min="0" step="0.01" inputMode="decimal" value={f.area} onChange={set("area")} placeholder="0" />
         </div>
       </div>
+      <div className="f">
+        <label htmlFor="fDims">{t("O'lcham")}</label>
+        <input id="fDims" type="text" value={f.dims} onChange={set("dims")} placeholder={t("Masalan: 2100×600")} />
+      </div>
+
+      <h4 className="fsec">{t("Material")}</h4>
       <div className="two">
         <div className="f">
-          <label htmlFor="fMat">{t("Material")}</label>
+          <label htmlFor="fMat">{t("Material turi")}</label>
           <input id="fMat" type="text" list="matList" value={f.material} onChange={set("material")} placeholder={t("Tanlang yoki o'zingiz yozing")} autoComplete="off" />
           <datalist id="matList">
             {MATERIALS.map((m) => (
@@ -184,74 +199,110 @@ export default function JobForm({ job, isAdmin, customers, materialPrices = {}, 
           <input id="fColor" type="text" value={f.color} onChange={set("color")} placeholder={t("Yoki rangni o'zingiz yozing")} />
         </div>
       )}
-      <div className="f">
-        <label htmlFor="fDims">{t("O'lcham")}</label>
-        <input id="fDims" type="text" value={f.dims} onChange={set("dims")} placeholder={t("Masalan: 2100×600")} />
-      </div>
+
       {isAdmin && (
         <>
-          {hasMat && (
-            <div className="f">
-              <label className="chk">
-                <input type="checkbox" checked={f.matOurs} onChange={(e) => setF((s) => ({ ...s, matOurs: e.target.checked }))} />
-                {t("Material bizdan beriladi")}
-              </label>
-              {f.matOurs && (
-                <>
-                  <div className="two">
-                    <div>
-                      <label htmlFor="fMatRate">{t("Material narxi (so'm / m²)")}</label>
-                      <input id="fMatRate" type="number" min="0" value={f.matRate} onChange={(e) => { setSaved(false); set("matRate")(e); }} placeholder={listRate ? fmt(listRate) : "0"} />
-                    </div>
-                    <div>
-                      <label>{t("Material narxi")}</label>
-                      {matRateN > 0 ? (
-                        <div className="calcbox">{fmtArea(areaN)} m² × {fmt(matRateN)} = <b>{fmt(matCost)}</b></div>
-                      ) : (
-                        <input id="fMatPrice" type="number" min="0" value={f.matPrice} onChange={set("matPrice")} placeholder={t("Material narxi (so'm)")} aria-label={t("Material narxi (so'm)")} />
-                      )}
-                    </div>
-                  </div>
-                  <div className="matlist">
-                    {listRate > 0 && matRateN !== listRate && (
-                      <button type="button" className="btn small" onClick={() => setF((s) => ({ ...s, matRate: String(listRate) }))}>
-                        {t("Ro'yxatdagi narx")}: {fmt(listRate)}
-                      </button>
-                    )}
-                    {matRateN > 0 && matRateN !== listRate && (
-                      <button type="button" className="btn small" onClick={() => { onSaveMaterialPrice && onSaveMaterialPrice(f.material, matRateN); setSaved(true); }}>
-                        {t("Narxni ro'yxatga saqlash")}
-                      </button>
-                    )}
-                    {saved && <span className="meta">✓ {t("Saqlandi")}</span>}
-                  </div>
-                </>
+          <h4 className="fsec">{t("Narx")}</h4>
+          <div className="pbox">
+            <div className="plabel">{t("Rover xizmati narxi")}</div>
+            <div className="seg" role="tablist">
+              <button type="button" role="tab" aria-selected={mode === "m2"} className={mode === "m2" ? "on" : ""} onClick={() => setMode("m2")}>
+                {t("Kvadratiga qarab")}
+              </button>
+              <button type="button" role="tab" aria-selected={mode === "list"} className={mode === "list" ? "on" : ""} onClick={() => setMode("list")}>
+                {t("Listiga qarab")}
+              </button>
+              {mode === "manual" && (
+                <button type="button" role="tab" aria-selected="true" className="on">
+                  {t("Qo'lda")}
+                </button>
               )}
             </div>
-          )}
-          <div className="two">
-            <div className="f">
-              <label htmlFor="fRate">{t("Rover xizmati narxi (so'm / m²)")}</label>
-              <input id="fRate" type="number" min="0" value={f.rate} onChange={set("rate")} placeholder="0" />
-            </div>
-            {rateN > 0 ? (
-              <div className="f">
-                <label>{t("Xizmat narxi")}</label>
-                <div className="calcbox">{fmtArea(areaN)} m² × {fmt(rateN)} = <b>{fmt(service)}</b></div>
-              </div>
-            ) : (
-              <div className="f">
-                <label htmlFor="fPrice">{t("Narx (so'm)")}</label>
-                <input id="fPrice" type="number" min="0" value={f.price} onChange={set("price")} placeholder="0" />
+            {mode === "m2" && (
+              <div className="prow">
+                <div className="f">
+                  <label htmlFor="fRate">{t("1 m² narxi (so'm)")}</label>
+                  <input id="fRate" type="number" min="0" value={f.rate} onChange={set("rate")} placeholder="0" />
+                </div>
+                <div className="calcbox">
+                  {fmtArea(areaN)} m² × {fmt(rateN)} = <b>{fmt(service)}</b>
+                </div>
               </div>
             )}
-          </div>
-          {priceN > 0 && (matN > 0 || rateN > 0) && (
-            <div className="rest ok" role="status">
-              {t("Jami narx")}: <b>{fmt(priceN)} {t("so'm")}</b>
-              {matN > 0 && <span className="calc"> ({fmt(service)} + {t("material")} {fmt(matN)})</span>}
+            {mode === "list" && (
+              <div className="prow">
+                <div className="f">
+                  <label htmlFor="fLists">{t("Listlar soni")}</label>
+                  <input id="fLists" type="number" min="0" step="0.5" inputMode="decimal" value={f.lists} onChange={set("lists")} placeholder="0" />
+                </div>
+                <div className="f">
+                  <label htmlFor="fRate">{t("1 list narxi (so'm)")}</label>
+                  <input id="fRate" type="number" min="0" value={f.rate} onChange={set("rate")} placeholder="0" />
+                </div>
+                <div className="calcbox">
+                  {fmt(listsN)} {t("list")} × {fmt(rateN)} = <b>{fmt(service)}</b>
+                </div>
+              </div>
+            )}
+            {mode === "manual" && (
+              <div className="prow">
+                <div className="f">
+                  <label htmlFor="fPrice">{t("Narx (so'm)")}</label>
+                  <input id="fPrice" type="number" min="0" value={f.price} onChange={set("price")} placeholder="0" />
+                </div>
+                <div className="meta">{t("Eski usulda kiritilgan narx. Yangi hisob uchun yuqoridagi variantlardan birini tanlang.")}</div>
+              </div>
+            )}
+
+            {hasMat && (
+              <div className="pmat">
+                <label className="chk">
+                  <input type="checkbox" checked={f.matOurs} onChange={(e) => setF((s) => ({ ...s, matOurs: e.target.checked }))} />
+                  {t("Material bizdan beriladi")}
+                </label>
+                {f.matOurs && (
+                  <>
+                    <div className="prow">
+                      <div className="f">
+                        <label htmlFor="fMatRate">{t("Material narxi (so'm / m²)")}</label>
+                        <input id="fMatRate" type="number" min="0" value={f.matRate} onChange={(e) => { setSaved(false); set("matRate")(e); }} placeholder={listRate ? fmt(listRate) : "0"} />
+                      </div>
+                      {matRateN > 0 ? (
+                        <div className="calcbox">
+                          {fmtArea(areaN)} m² × {fmt(matRateN)} = <b>{fmt(matCost)}</b>
+                        </div>
+                      ) : (
+                        <div className="f">
+                          <label htmlFor="fMatPrice">{t("Yoki jami summa (so'm)")}</label>
+                          <input id="fMatPrice" type="number" min="0" value={f.matPrice} onChange={set("matPrice")} placeholder="0" />
+                        </div>
+                      )}
+                    </div>
+                    <div className="matlist">
+                      {listRate > 0 && matRateN !== listRate && (
+                        <button type="button" className="btn small" onClick={() => setF((s) => ({ ...s, matRate: String(listRate) }))}>
+                          {t("Ro'yxatdagi narx")}: {fmt(listRate)}
+                        </button>
+                      )}
+                      {matRateN > 0 && matRateN !== listRate && (
+                        <button type="button" className="btn small" onClick={() => { onSaveMaterialPrice && onSaveMaterialPrice(f.material, matRateN); setSaved(true); }}>
+                          {t("Narxni ro'yxatga saqlash")}
+                        </button>
+                      )}
+                      {saved && <span className="meta">✓ {t("Saqlandi")}</span>}
+                    </div>
+                  </>
+                )}
+              </div>
+            )}
+
+            <div className="psum">
+              <div><span>{t("Rover xizmati")}</span><b>{fmt(service)}</b></div>
+              {matN > 0 && <div><span>{t("Material")}</span><b>{fmt(matN)}</b></div>}
+              <div className="tot"><span>{t("Jami narx")}</span><b>{fmt(priceN)} {t("so'm")}</b></div>
             </div>
-          )}
+          </div>
+
           <div className="f">
             <label htmlFor="fAdv">{t("Olingan avans (so'm)")}</label>
             <input id="fAdv" type="number" min="0" value={f.advance} onChange={set("advance")} placeholder="0" />
@@ -275,6 +326,8 @@ export default function JobForm({ job, isAdmin, customers, materialPrices = {}, 
           )}
         </>
       )}
+
+      <h4 className="fsec">{t("Muddat va holat")}</h4>
       <div className="two">
         <div className="f">
           <label htmlFor="fDue">{t("Topshirish muddati")}</label>
@@ -295,11 +348,12 @@ export default function JobForm({ job, isAdmin, customers, materialPrices = {}, 
         <label htmlFor="fNote">{t("Izoh")}</label>
         <textarea id="fNote" value={f.note} onChange={set("note")} placeholder={t("Qo'shimcha eslatma")} />
       </div>
+
+      <h4 className="fsec">{t("Fayl va rasm")}</h4>
       <div className="f">
-        <label htmlFor="fFile">{t("Fayl biriktirish")}</label>
         <div className="imgrow">
           <label className="btn small" htmlFor="fFile" style={{ cursor: "pointer" }}>
-            {t("Fayl tanlash")}
+            {t("Fayl biriktirish")}
           </label>
           <input id="fFile" type="file" onChange={pickFile} style={{ display: "none" }} />
           {f.fileName && <span className="fname">📎 {f.fileName}</span>}
@@ -312,11 +366,10 @@ export default function JobForm({ job, isAdmin, customers, materialPrices = {}, 
         {up && <div className="meta">{up}</div>}
       </div>
       <div className="f">
-        <label htmlFor="fImg">{t("Rasm / chizma")}</label>
         <div className="imgrow">
           {f.img && <img src={f.img} alt="" />}
           <label className="btn small" htmlFor="fImg" style={{ cursor: "pointer" }}>
-            {t("Rasm tanlash")}
+            {t("Rasm / chizma")}
           </label>
           <input id="fImg" type="file" accept="image/*" onChange={pickImg} style={{ display: "none" }} />
           {f.img && (
@@ -326,6 +379,7 @@ export default function JobForm({ job, isAdmin, customers, materialPrices = {}, 
           )}
         </div>
       </div>
+
       <div className="mbtns">
         {job && isAdmin && (
           <button className="btn danger" onClick={() => onDelete(job)}>

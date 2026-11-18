@@ -69,6 +69,7 @@ export function toRow(j) {
     // New optional columns: rate (so'm per m²), mat_ours (material supplied by us), mat_price. Same rule as "area".
     ...(j.color || j.hadColor ? { color: j.color || "" } : {}),
     ...(j.filePath || j.hadFile ? { file_name: j.fileName || "", file_path: j.filePath || "" } : {}),
+    ...(j.priceMode || j.hadMode ? { price_mode: j.priceMode || "", lists: j.lists || 0 } : {}),
     ...(j.rate > 0 || j.hadRate ? { rate: j.rate || 0 } : {}),
     ...(j.matOurs || j.hadMat ? { mat_ours: !!j.matOurs } : {}),
     ...(j.matPrice > 0 || j.hadMat ? { mat_price: j.matPrice || 0 } : {}),
@@ -90,6 +91,9 @@ export function fromRow(r) {
     fileName: r.file_name || "",
     filePath: r.file_path || "",
     hadFile: "file_path" in r,
+    priceMode: r.price_mode || (Number(r.rate) > 0 ? "m2" : ""),
+    lists: Number(r.lists) || 0,
+    hadMode: "price_mode" in r,
     rate: Number(r.rate) || 0,
     hadRate: "rate" in r,
     matOurs: !!r.mat_ours,
