@@ -2,7 +2,6 @@ import { useState } from "react";
 import Page from "./Page.jsx";
 import JobForm from "./JobForm.jsx";
 import ConfirmDialog from "./ConfirmDialog.jsx";
-import Filters, { NO_FILTER, passes } from "./Filters.jsx";
 import Icon from "./Icons.jsx";
 import { fmt, fmtArea, debtOf } from "../utils.js";
 
@@ -10,14 +9,13 @@ import { fmt, fmtArea, debtOf } from "../utils.js";
 export default function Archive({ data, isAdmin }) {
   const { jobs, customers, saveJob, removeJob, savePhone } = data;
   const [q, setQ] = useState("");
-  const [flt, setFlt] = useState(NO_FILTER);
   const [form, setForm] = useState(null);
   const [confirm, setConfirm] = useState(null);
   const [bigImg, setBigImg] = useState(null);
 
   const query = q.trim().toLowerCase();
   const list = jobs
-    .filter((j) => j.stage === 4 && passes(j, flt, isAdmin))
+    .filter((j) => j.stage === 4)
     .filter((j) => !query || (j.title + " " + j.customer + " " + (j.material || "")).toLowerCase().includes(query))
     .sort((a, b) => (b.done || "").localeCompare(a.done || "") || b.pos - a.pos);
   const total = jobs.filter((j) => j.stage === 4).length;
@@ -53,8 +51,6 @@ export default function Archive({ data, isAdmin }) {
         <input type="search" placeholder="Qidirish..." aria-label="Qidirish" value={q} onChange={(e) => setQ(e.target.value)} />
         <span className="arch-count">{total} ta ish</span>
       </div>
-
-      <Filters jobs={jobs.filter((j) => j.stage === 4)} f={flt} setF={setFlt} isAdmin={isAdmin} />
 
       {list.length === 0 && (
         <div className="empty">
