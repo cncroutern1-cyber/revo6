@@ -55,6 +55,10 @@ export function toRow(j) {
     pos: j.pos || Date.now(),
     // "area" is written only when the column exists in the database (or a value is entered), so older databases keep working.
     ...(j.area > 0 || j.hadArea ? { area: j.area || 0 } : {}),
+    // New optional columns: rate (so'm per m²), mat_ours (material supplied by us), mat_price. Same rule as "area".
+    ...(j.rate > 0 || j.hadRate ? { rate: j.rate || 0 } : {}),
+    ...(j.matOurs || j.hadMat ? { mat_ours: !!j.matOurs } : {}),
+    ...(j.matPrice > 0 || j.hadMat ? { mat_price: j.matPrice || 0 } : {}),
   };
 }
 
@@ -68,6 +72,11 @@ export function fromRow(r) {
     pos: Number(r.pos),
     area: Number(r.area) || 0,
     hadArea: "area" in r,
+    rate: Number(r.rate) || 0,
+    hadRate: "rate" in r,
+    matOurs: !!r.mat_ours,
+    matPrice: Number(r.mat_price) || 0,
+    hadMat: "mat_ours" in r,
   };
 }
 

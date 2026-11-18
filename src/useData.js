@@ -63,20 +63,22 @@ export function useData() {
     return true;
   };
 
-  // If the "area" column has not been added to Supabase yet, save without it instead of losing the job.
+  // If an optional column (area, rate, mat_ours, mat_price) is not in Supabase yet, save without it instead of losing the job.
+  const OPTIONAL = ["area", "rate", "mat_ours", "mat_price"];
   const upsertJobs = async (rows) => {
-    let r = await sb.from("jobs").upsert(rows);
-    if (r.error && /area/i.test(r.error.message || "")) {
+    let cur = rows;
+    for (let i = 0; i <= OPTIONAL.length; i++) {
+      const r = await sb.from("jobs").upsert(cur);
+      const col = r.error && OPTIONAL.find((c) => (r.error.message || "").includes(c));
+      if (!col) return r;
+      console.warn(`jobs.${col} ustuni yo'q — supabase-yangilash-area.sql ni ishga tushiring`);
       const strip = (x) => {
-        const { area, ...rest } = x;
+        const { [col]: _drop, ...rest } = x;
         return rest;
       };
-      r = await sb.from("jobs").upsert(Array.isArray(rows) ? rows.map(strip) : strip(rows));
-      if (!r.error) {
-        console.warn("jobs.area ustuni yo'q — supabase-yangilash-area.sql ni ishga tushiring");
-      }
+      cur = Array.isArray(cur) ? cur.map(strip) : strip(cur);
     }
-    return r;
+    return { error: { message: "Saqlab bo'lmadi" } };
   };
 
   const saveJob = (j) => {

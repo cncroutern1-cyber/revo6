@@ -1,7 +1,8 @@
 import { useState } from "react";
 import Modal from "./Modal.jsx";
-import { STAGE_NAMES, uid, todayStr, resizeImg, fmt } from "../utils.js";
+import { STAGE_NAMES, uid, todayStr, resizeImg, fmt, fmtArea } from "../utils.js";
 import { useT } from "../i18n.jsx";
+import { printJob } from "../pdf.js";
 
 const MATERIALS = ["LDSP", "MDF", "Massiv", "Fanera"];
 
@@ -17,6 +18,9 @@ export default function JobForm({ job, isAdmin, customers, onSave, onDelete, onC
     thick: job?.thick || "",
     dims: job?.dims || "",
     price: job?.price || "",
+    rate: job?.rate || "",
+    matOurs: !!job?.matOurs,
+    matPrice: job?.matPrice || "",
     advance: job?.advance || "",
     due: job?.due || "",
     stage: job ? job.stage : 0,
@@ -28,7 +32,13 @@ export default function JobForm({ job, isAdmin, customers, onSave, onDelete, onC
   const names = Object.keys(customers);
 
   // Price minus advance, shown as soon as either is typed.
-  const priceN = parseFloat(f.price) || 0;
+  // Rover service = area × price per m² (if a rate is entered; otherwise the manual price). Material is added only when we supply it.
+  const areaN = parseFloat(f.area) || 0;
+  const rateN = parseFloat(f.rate) || 0;
+  const service = rateN > 0 ? Math.round(areaN * rateN) : parseFloat(f.price) || 0;
+  const hasMat = f.material.trim() !== "";
+  const matN = hasMat && f.matOurs ? parseFloat(f.matPrice) || 0 : 0;
+  const priceN = service + matN;
   const advN = parseFloat(f.advance) || 0;
   const rest = priceN - advN;
 
@@ -46,7 +56,7 @@ export default function JobForm({ job, isAdmin, customers, onSave, onDelete, onC
     setF((s) => ({ ...s, img }));
   }
 
-  function submit() {
+  function submit(pdf) {
     const title = f.title.trim();
     if (!title) return document.getElementById("fTitle").focus();
     const stage = Number(f.stage);
@@ -74,13 +84,17 @@ export default function JobForm({ job, isAdmin, customers, onSave, onDelete, onC
       img: f.img,
     };
     if (isAdmin) {
-      j.price = Math.max(0, parseFloat(f.price) || 0);
+      j.rate = Math.max(0, rateN);
+      j.matOurs = hasMat && !!f.matOurs;
+      j.matPrice = j.matOurs ? Math.max(0, parseFloat(f.matPrice) || 0) : 0;
+      j.price = Math.max(0, priceN);
       j.advance = Math.max(0, parseFloat(f.advance) || 0);
     }
     if (j.stage !== stage) {
       j = { ...j, stage, done: stage >= 3 ? j.done || todayStr() : "", pos: Date.now() };
     }
     onSave(j, f.phone.trim());
+    if (pdf === true) printJob(j, { t, isAdmin, phone: f.phone.trim() });
   }
 
   return (
@@ -135,15 +149,43 @@ export default function JobForm({ job, isAdmin, customers, onSave, onDelete, onC
       </div>
       {isAdmin && (
         <>
+          {hasMat && (
+            <div className="f">
+              <label className="chk">
+                <input type="checkbox" checked={f.matOurs} onChange={(e) => setF((s) => ({ ...s, matOurs: e.target.checked }))} />
+                {t("Material bizdan beriladi")}
+              </label>
+              {f.matOurs && (
+                <input id="fMatPrice" type="number" min="0" value={f.matPrice} onChange={set("matPrice")} placeholder={t("Material narxi (so'm)")} aria-label={t("Material narxi (so'm)")} />
+              )}
+            </div>
+          )}
           <div className="two">
             <div className="f">
-              <label htmlFor="fPrice">{t("Narx (so'm)")}</label>
-              <input id="fPrice" type="number" min="0" value={f.price} onChange={set("price")} placeholder="0" />
+              <label htmlFor="fRate">{t("Rover xizmati narxi (so'm / m²)")}</label>
+              <input id="fRate" type="number" min="0" value={f.rate} onChange={set("rate")} placeholder="0" />
             </div>
-            <div className="f">
-              <label htmlFor="fAdv">{t("Olingan avans (so'm)")}</label>
-              <input id="fAdv" type="number" min="0" value={f.advance} onChange={set("advance")} placeholder="0" />
+            {rateN > 0 ? (
+              <div className="f">
+                <label>{t("Xizmat narxi")}</label>
+                <div className="calcbox">{fmtArea(areaN)} m² × {fmt(rateN)} = <b>{fmt(service)}</b></div>
+              </div>
+            ) : (
+              <div className="f">
+                <label htmlFor="fPrice">{t("Narx (so'm)")}</label>
+                <input id="fPrice" type="number" min="0" value={f.price} onChange={set("price")} placeholder="0" />
+              </div>
+            )}
+          </div>
+          {priceN > 0 && (matN > 0 || rateN > 0) && (
+            <div className="rest ok" role="status">
+              {t("Jami narx")}: <b>{fmt(priceN)} {t("so'm")}</b>
+              {matN > 0 && <span className="calc"> ({fmt(service)} + {t("material")} {fmt(matN)})</span>}
             </div>
+          )}
+          <div className="f">
+            <label htmlFor="fAdv">{t("Olingan avans (so'm)")}</label>
+            <input id="fAdv" type="number" min="0" value={f.advance} onChange={set("advance")} placeholder="0" />
           </div>
           {(priceN > 0 || advN > 0) && (
             <div className={"rest" + (rest < 0 ? " bad" : rest === 0 ? " ok" : "")} role="status">
@@ -209,7 +251,10 @@ export default function JobForm({ job, isAdmin, customers, onSave, onDelete, onC
         <button className="btn" onClick={onClose}>
           {t("Bekor qilish")}
         </button>
-        <button className="btn primary" onClick={submit}>
+        <button className="btn" onClick={() => submit(true)}>
+          {t("PDF saqlash")}
+        </button>
+        <button className="btn primary" onClick={() => submit()}>
           {t("Saqlash")}
         </button>
       </div>

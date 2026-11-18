@@ -64,20 +64,6 @@ export default function Jobs({ data, isAdmin }) {
     });
   }
 
-  function clearDone() {
-    const ids = jobs.filter((j) => j.stage === 3).map((j) => j.id);
-    if (!ids.length) return;
-    setConfirm({
-      title: t("Tayyor ishlarni tozalash"),
-      text: t("Tayyor ustunidagi {0} ta ish hamma qurilmalardan o'chiriladi. Buni qaytarib bo'lmaydi.", ids.length),
-      yes: t("Hammasini o'chirish"),
-      onYes: async () => {
-        setConfirm(null);
-        await removeMany(ids);
-      },
-    });
-  }
-
   return (
     <>
       <div className="toolbar">
@@ -108,11 +94,6 @@ export default function Jobs({ data, isAdmin }) {
                 <i className="stagebar" />
                 {t(name)}
                 <span className="n">{total}</span>
-                {isAdmin && s === 3 && total > 0 && (
-                  <button className="clear" onClick={clearDone}>
-                    {t("Tozalash")}
-                  </button>
-                )}
               </h2>
               <div className="list">
                 {shown.length === 0 && <div className="empty">{query ? t("Topilmadi") : t("Bo'sh")}</div>}
