@@ -305,11 +305,12 @@ var pages=["home","products","rover","about","why-us","contact"];
 document.querySelectorAll("img[data-use]").forEach(function(i){var s=document.querySelector('.pc img[data-k="'+i.dataset.use+'"]');if(s)i.src=s.src});
 document.addEventListener("contextmenu",function(e){if(e.target.closest&&e.target.closest(".pimg"))e.preventDefault()});
 document.addEventListener("dragstart",function(e){if(e.target.tagName==="IMG")e.preventDefault()});
-function show(){var h=(location.hash||"").replace("#","");if(pages.indexOf(h)<0)h="home";
+function show(x){var h=typeof x==="string"?x:(location.hash||"").replace("#","");if(pages.indexOf(h)<0)h="home";
 pages.forEach(function(p){var el=document.getElementById(p);el.classList.toggle("on",p===h);if(p===h)document.title=el.dataset.t});
 document.querySelectorAll("nav a").forEach(function(a){if(a.dataset.p===h)a.setAttribute("aria-current","page");else a.removeAttribute("aria-current")});
 window.scrollTo(0,0)}
-window.addEventListener("hashchange",show);show();
+window.addEventListener("hashchange",function(){show()});show();
+document.addEventListener("click",function(e){var a=e.target.closest&&e.target.closest('a[href^="#"]');if(!a)return;var h=a.getAttribute("href").slice(1);if(pages.indexOf(h)<0)return;e.preventDefault();try{if(location.hash!=="#"+h)location.hash=h}catch(x){}show(h)});
 document.getElementById("s").addEventListener("click",function(){
 var n=document.getElementById("n").value.trim(),c=document.getElementById("c").value.trim(),m=document.getElementById("m").value.trim(),out=document.getElementById("msg");
 if(!n||!c||!m){out.textContent="Iltimos, barcha maydonlarni to‘ldiring.";return}
