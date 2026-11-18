@@ -41,7 +41,7 @@ nav a:hover{color:var(--ink)}nav a[aria-current="page"]{color:var(--ink);border-
 .facts span{color:var(--muted);font-size:.92rem}
 section.sec{padding:88px 0}.sec.alt{background:var(--alt)}
 .head{max-width:620px;margin-bottom:48px}
-.pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,225px));gap:16px}
+.pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,225px));gap:16px;justify-content:center}
 .pimg{position:relative;overflow:hidden;margin-bottom:12px;background:#fff}
 .pimg img{width:100%;aspect-ratio:1/1;object-fit:contain;display:block}
 
@@ -198,6 +198,9 @@ input.bad,textarea.bad{border-color:#A5301F}
 .mapsec .mapframe iframe{height:380px}
 .mapsec .btn,.mapbox .btn{margin-top:14px;display:inline-flex;width:auto}
 @media(max-width:700px){.mapsec{padding-top:36px;padding-bottom:44px}.mapsec .mapframe iframe{height:280px}}
+#products .page>:not(.pgrid){text-align:center}
+#products .page>:not(.pgrid){margin-left:auto;margin-right:auto}
+#products .page>.eyebrow{display:block}
 </style><script>if("IntersectionObserver"in window&&!matchMedia("(prefers-reduced-motion:reduce)").matches)document.documentElement.className+=" js"</script></head><body><div id="pg"></div>
 <header><div class="bar">
 <a class="logo" href="#home" aria-label="Revo — bosh sahifa">REVO<small>SHIRMALAR</small></a>
