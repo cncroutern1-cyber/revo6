@@ -13,21 +13,24 @@ export default function Jobs({ data, isAdmin }) {
   const [form, setForm] = useState(null); // { job } (job is null for a new one)
   const [confirm, setConfirm] = useState(null);
   const [bigImg, setBigImg] = useState(null);
-  // "Kichraytirish": every card shrinks to one line; a single card can still be opened with its own button.
-  const [compact, setCompact] = useState(() => {
+  // "Kichraytirish": cards of a column (or of every column) shrink to one line; one card can still be opened with its own button.
+  const [cmp, setCmp] = useState(() => {
     try {
-      return localStorage.getItem("ish-kuzatuv-compact") === "1";
+      const v = JSON.parse(localStorage.getItem("ish-kuzatuv-compact") || "[]");
+      return [0, 1, 2, 3].map((i) => v[i] === true);
     } catch (e) {
-      return false;
+      return [false, false, false, false];
     }
   });
-  const toggleCompact = () =>
-    setCompact((c) => {
-      try {
-        localStorage.setItem("ish-kuzatuv-compact", c ? "0" : "1");
-      } catch (e) {}
-      return !c;
-    });
+  const saveCmp = (v) => {
+    try {
+      localStorage.setItem("ish-kuzatuv-compact", JSON.stringify(v));
+    } catch (e) {}
+    return v;
+  };
+  const allCompact = cmp.every(Boolean);
+  const toggleAll = () => setCmp(saveCmp(cmp.map(() => !allCompact)));
+  const toggleCol = (s) => setCmp(saveCmp(cmp.map((c, i) => (i === s ? !c : c))));
 
   const sortByDue = false;
   const query = q.trim().toLowerCase();
@@ -91,8 +94,8 @@ export default function Jobs({ data, isAdmin }) {
           </div>
         )}
         <div className="spacer" />
-        <button className="btn" onClick={toggleCompact} title={compact ? t("Hamma ishni kattalashtirish") : t("Hamma ishni kichraytirish")}>
-          {compact ? t("⤢ Kattalashtirish") : t("⤡ Kichraytirish")}
+        <button className="btn" onClick={toggleAll} title={allCompact ? t("Hamma ishni kattalashtirish") : t("Hamma ishni kichraytirish")}>
+          {allCompact ? t("⤢ Kattalashtirish") : t("⤡ Kichraytirish")}
         </button>
         <button className="btn primary" onClick={() => setForm({ job: null })}>
           {t("+ Yangi ish")}
@@ -112,13 +115,16 @@ export default function Jobs({ data, isAdmin }) {
                 <i className="stagebar" />
                 {t(name)}
                 <span className="n">{total}</span>
+                <button className="ic colbtn" onClick={() => toggleCol(s)} title={cmp[s] ? t("Kattalashtirish") : t("Kichraytirish")} aria-label={cmp[s] ? t("Kattalashtirish") : t("Kichraytirish")}>
+                  {cmp[s] ? "⤢" : "⤡"}
+                </button>
               </h2>
               <div className="list">
                 {shown.length === 0 && <div className="empty">{query ? t("Topilmadi") : t("Bo'sh")}</div>}
                 {shown.map((j) => (
                   <Card
-                    key={j.id + (compact ? "-c" : "")}
-                    compact={compact}
+                    key={j.id + (cmp[s] ? "-c" : "")}
+                    compact={cmp[s]}
                     j={j}
                     idx={items.indexOf(j)}
                     count={items.length}
