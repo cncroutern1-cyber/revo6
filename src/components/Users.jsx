@@ -3,6 +3,7 @@ import Page from "./Page.jsx";
 import ConfirmDialog from "./ConfirmDialog.jsx";
 import PasswordInput from "./PasswordInput.jsx";
 import { sb } from "../supabase.js";
+import { useT } from "../i18n.jsx";
 
 // All user changes go through a server function (manage-users) that checks the caller is an admin.
 async function callAdmin(body) {
@@ -25,6 +26,7 @@ async function callAdmin(body) {
 }
 
 export default function Users({ me }) {
+  const t = useT();
   const [users, setUsers] = useState(null);
   const [err, setErr] = useState("");
   const [notice, setNotice] = useState(null); // { text, pw }
@@ -63,20 +65,20 @@ export default function Users({ me }) {
   async function add(e) {
     e.preventDefault();
     const username = form.username.trim();
-    if (!username || !form.password) return setErr("Ism va parolni kiriting.");
+    if (!username || !form.password) return setErr(t("Ism va parolni kiriting."));
     const ok = await run(
       { action: "create", username, password: form.password, role: form.role },
-      `"${username}" qo'shildi. Parol:`,
+      t("\"{0}\" qo'shildi. Parol:", username),
       form.password
     );
     if (ok) setForm({ username: "", password: "", role: "worker" });
   }
 
   async function changePw() {
-    if (!edit.pw) return setErr("Yangi parolni kiriting.");
+    if (!edit.pw) return setErr(t("Yangi parolni kiriting."));
     const ok = await run(
       { action: "password", username: edit.username, password: edit.pw },
-      `"${edit.username}" paroli o'zgartirildi. Yangi parol:`,
+      t("\"{0}\" paroli o'zgartirildi. Yangi parol:", edit.username),
       edit.pw
     );
     if (ok) setEdit(null);
@@ -85,7 +87,7 @@ export default function Users({ me }) {
   async function remove() {
     const username = ask;
     setAsk(null);
-    await run({ action: "delete", username }, `"${username}" o'chirildi.`);
+    await run({ action: "delete", username }, t("\"{0}\" o'chirildi.", username));
   }
 
   async function copy(text) {
@@ -97,8 +99,8 @@ export default function Users({ me }) {
   }
 
   return (
-    <Page title="Foydalanuvchilar">
-      {err && <div className="errtxt" style={{ marginBottom: 10 }}>{err}</div>}
+    <Page title={t("Foydalanuvchilar")}>
+      {err && <div className="errtxt" style={{ marginBottom: 10 }}>{t(err)}</div>}
       {notice && (
         <div className="notice">
           <div>
@@ -106,49 +108,49 @@ export default function Users({ me }) {
           </div>
           {notice.pw && (
             <>
-              <div className="hint">Parolni hozir nusxalab oling. Keyin uni ko'rib bo'lmaydi.</div>
+              <div className="hint">{t("Parolni hozir nusxalab oling. Keyin uni ko'rib bo'lmaydi.")}</div>
               <button className="btn small" onClick={() => copy(notice.pw)}>
-                Nusxalash
+                {t("Nusxalash")}
               </button>
             </>
           )}
         </div>
       )}
 
-      {users === null && !err && <div className="empty">Yuklanmoqda...</div>}
+      {users === null && !err && <div className="empty">{t("Yuklanmoqda...")}</div>}
       {users &&
         users.map((u) => (
           <div className="urow" key={u.username}>
             <div className="uline">
               <div className="uname">
                 <b>{u.username}</b>
-                <span className={"chip " + (u.role === "admin" ? "yel" : "")}>{u.role === "admin" ? "Admin" : "Ishchi"}</span>
-                {u.username === me && <span className="chip">Siz</span>}
+                <span className={"chip " + (u.role === "admin" ? "yel" : "")}>{u.role === "admin" ? t("Admin") : t("Ishchi")}</span>
+                {u.username === me && <span className="chip">{t("Siz")}</span>}
               </div>
               <div className="uact">
                 <button className="btn small" onClick={() => setEdit({ username: u.username, pw: "" })}>
-                  Parolni o'zgartirish
+                  {t("Parolni o'zgartirish")}
                 </button>
                 <button className="btn small danger" disabled={u.username === me} onClick={() => setAsk(u.username)}>
-                  O'chirish
+                  {t("O'chirish")}
                 </button>
               </div>
             </div>
             {edit && edit.username === u.username && (
               <div className="pwedit">
                 <PasswordInput
-                  placeholder="Yangi parol (kamida 6 belgi)"
-                  ariaLabel="Yangi parol"
+                  placeholder={t("Yangi parol (kamida 6 belgi)")}
+                  ariaLabel={t("Yangi parol")}
                   value={edit.pw}
                   onChange={(e) => setEdit({ ...edit, pw: e.target.value })}
                   autoComplete="new-password"
                   autoFocus
                 />
                 <button className="btn small primary" disabled={busy} onClick={changePw}>
-                  Saqlash
+                  {t("Saqlash")}
                 </button>
                 <button className="btn small" onClick={() => setEdit(null)}>
-                  Bekor qilish
+                  {t("Bekor qilish")}
                 </button>
               </div>
             )}
@@ -156,35 +158,35 @@ export default function Users({ me }) {
         ))}
 
       <form className="uadd" onSubmit={add}>
-        <div className="sub" style={{ marginTop: 0 }}>Yangi foydalanuvchi qo'shish</div>
+        <div className="sub" style={{ marginTop: 0 }}>{t("Yangi foydalanuvchi qo'shish")}</div>
         <div className="two">
           <div className="f">
-            <label htmlFor="nuName">Ism (login uchun)</label>
-            <input id="nuName" type="text" value={form.username} onChange={(e) => setForm({ ...form, username: e.target.value })} placeholder="Masalan: Jasur" />
+            <label htmlFor="nuName">{t("Ism (login uchun)")}</label>
+            <input id="nuName" type="text" value={form.username} onChange={(e) => setForm({ ...form, username: e.target.value })} placeholder={t("Masalan: Jasur")} />
           </div>
           <div className="f">
-            <label htmlFor="nuRole">Vazifasi</label>
+            <label htmlFor="nuRole">{t("Vazifasi")}</label>
             <select id="nuRole" value={form.role} onChange={(e) => setForm({ ...form, role: e.target.value })}>
-              <option value="worker">Ishchi</option>
-              <option value="admin">Admin</option>
+              <option value="worker">{t("Ishchi")}</option>
+              <option value="admin">{t("Admin")}</option>
             </select>
           </div>
         </div>
         <div className="f">
-          <label htmlFor="nuPass">Parol (kamida 6 belgi)</label>
+          <label htmlFor="nuPass">{t("Parol (kamida 6 belgi)")}</label>
           <PasswordInput id="nuPass" autoComplete="new-password" value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} />
         </div>
         <div className="mbtns">
           <button className="btn primary" disabled={busy}>
-            Qo'shish
+            {t("Qo'shish")}
           </button>
         </div>
       </form>
 
       {ask && (
         <ConfirmDialog
-          title="Foydalanuvchini o'chirish"
-          text={`"${ask}" tizimdan o'chiriladi va endi kira olmaydi. Uning kiritgan ishlari saqlanib qoladi.`}
+          title={t("Foydalanuvchini o'chirish")}
+          text={t("\"{0}\" tizimdan o'chiriladi va endi kira olmaydi. Uning kiritgan ishlari saqlanib qoladi.", ask)}
           onYes={remove}
           onNo={() => setAsk(null)}
         />

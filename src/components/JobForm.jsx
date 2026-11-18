@@ -1,10 +1,12 @@
 import { useState } from "react";
 import Modal from "./Modal.jsx";
 import { STAGE_NAMES, uid, todayStr, resizeImg, fmt } from "../utils.js";
+import { useT } from "../i18n.jsx";
 
 const MATERIALS = ["LDSP", "MDF", "Massiv", "Fanera"];
 
 export default function JobForm({ job, isAdmin, customers, onSave, onDelete, onClose }) {
+  const t = useT();
   const [f, setF] = useState({
     title: job?.title || "",
     customer: job?.customer || "",
@@ -82,14 +84,14 @@ export default function JobForm({ job, isAdmin, customers, onSave, onDelete, onC
   }
 
   return (
-    <Modal title={job ? "Ishni tahrirlash" : "Yangi ish"} onClose={onClose}>
+    <Modal title={job ? t("Ishni tahrirlash") : t("Yangi ish")} onClose={onClose}>
       <div className="f">
-        <label htmlFor="fTitle">Ish nomi</label>
-        <input id="fTitle" type="text" value={f.title} onChange={set("title")} placeholder="Masalan: Oshxona eshiklari 3D" autoFocus />
+        <label htmlFor="fTitle">{t("Ish nomi")}</label>
+        <input id="fTitle" type="text" value={f.title} onChange={set("title")} placeholder={t("Masalan: Oshxona eshiklari 3D")} autoFocus />
       </div>
       <div className="two">
         <div className="f">
-          <label htmlFor="fCust">Mijoz</label>
+          <label htmlFor="fCust">{t("Mijoz")}</label>
           <input id="fCust" type="text" list="custNames" value={f.customer} onChange={pickCustomer} placeholder="Sherzod aka" />
           <datalist id="custNames">
             {names.map((n) => (
@@ -98,24 +100,24 @@ export default function JobForm({ job, isAdmin, customers, onSave, onDelete, onC
           </datalist>
         </div>
         <div className="f">
-          <label htmlFor="fPhone">Telefon</label>
+          <label htmlFor="fPhone">{t("Telefon")}</label>
           <input id="fPhone" type="tel" value={f.phone} onChange={set("phone")} placeholder="+998 90 123 45 67" />
         </div>
       </div>
       <div className="two">
         <div className="f">
-          <label htmlFor="fParts">Detallar soni</label>
+          <label htmlFor="fParts">{t("Detallar soni")}</label>
           <input id="fParts" type="number" min="1" value={f.parts} onChange={set("parts")} />
         </div>
         <div className="f">
-          <label htmlFor="fArea">Detallar kvadrati (m²)</label>
+          <label htmlFor="fArea">{t("Detallar kvadrati (m²)")}</label>
           <input id="fArea" type="number" min="0" step="0.01" inputMode="decimal" value={f.area} onChange={set("area")} placeholder="0" />
         </div>
       </div>
       <div className="two">
         <div className="f">
-          <label htmlFor="fMat">Material</label>
-          <input id="fMat" type="text" list="matList" value={f.material} onChange={set("material")} placeholder="Tanlang yoki o'zingiz yozing" autoComplete="off" />
+          <label htmlFor="fMat">{t("Material")}</label>
+          <input id="fMat" type="text" list="matList" value={f.material} onChange={set("material")} placeholder={t("Tanlang yoki o'zingiz yozing")} autoComplete="off" />
           <datalist id="matList">
             {MATERIALS.map((m) => (
               <option key={m} value={m} />
@@ -123,35 +125,35 @@ export default function JobForm({ job, isAdmin, customers, onSave, onDelete, onC
           </datalist>
         </div>
         <div className="f">
-          <label htmlFor="fThick">Qalinligi (mm)</label>
+          <label htmlFor="fThick">{t("Qalinligi (mm)")}</label>
           <input id="fThick" type="number" min="0" value={f.thick} onChange={set("thick")} placeholder="18" />
         </div>
       </div>
       <div className="f">
-        <label htmlFor="fDims">O'lcham</label>
-        <input id="fDims" type="text" value={f.dims} onChange={set("dims")} placeholder="Masalan: 2100×600" />
+        <label htmlFor="fDims">{t("O'lcham")}</label>
+        <input id="fDims" type="text" value={f.dims} onChange={set("dims")} placeholder={t("Masalan: 2100×600")} />
       </div>
       {isAdmin && (
         <>
           <div className="two">
             <div className="f">
-              <label htmlFor="fPrice">Narx (so'm)</label>
+              <label htmlFor="fPrice">{t("Narx (so'm)")}</label>
               <input id="fPrice" type="number" min="0" value={f.price} onChange={set("price")} placeholder="0" />
             </div>
             <div className="f">
-              <label htmlFor="fAdv">Olingan avans (so'm)</label>
+              <label htmlFor="fAdv">{t("Olingan avans (so'm)")}</label>
               <input id="fAdv" type="number" min="0" value={f.advance} onChange={set("advance")} placeholder="0" />
             </div>
           </div>
           {(priceN > 0 || advN > 0) && (
             <div className={"rest" + (rest < 0 ? " bad" : rest === 0 ? " ok" : "")} role="status">
               {rest < 0 ? (
-                <>Avans narxdan {fmt(-rest)} so'm ko'p. Summalarni tekshiring.</>
+                <>{t("Avans narxdan {0} so'm ko'p. Summalarni tekshiring.", fmt(-rest))}</>
               ) : rest === 0 ? (
-                <>To'liq to'langan</>
+                <>{t("To'liq to'langan")}</>
               ) : (
                 <>
-                  Qolgan to'lov: <b>{fmt(rest)} so'm</b>
+                  {t("Qolgan to'lov:")} <b>{fmt(rest)} {t("so'm")}</b>
                   <span className="calc">
                     {" "}
                     ({fmt(priceN)} − {fmt(advN)})
@@ -164,35 +166,35 @@ export default function JobForm({ job, isAdmin, customers, onSave, onDelete, onC
       )}
       <div className="two">
         <div className="f">
-          <label htmlFor="fDue">Topshirish muddati</label>
+          <label htmlFor="fDue">{t("Topshirish muddati")}</label>
           <input id="fDue" type="date" value={f.due} onChange={set("due")} />
         </div>
         <div className="f">
-          <label htmlFor="fStage">Bosqich</label>
+          <label htmlFor="fStage">{t("Bosqich")}</label>
           <select id="fStage" value={f.stage} onChange={set("stage")}>
             {STAGE_NAMES.map((s, i) => (
-              <option key={s} value={i}>
-                {s}
+              <option key={t(s)} value={i}>
+                {t(s)}
               </option>
             ))}
           </select>
         </div>
       </div>
       <div className="f">
-        <label htmlFor="fNote">Izoh</label>
-        <textarea id="fNote" value={f.note} onChange={set("note")} placeholder="Qo'shimcha eslatma" />
+        <label htmlFor="fNote">{t("Izoh")}</label>
+        <textarea id="fNote" value={f.note} onChange={set("note")} placeholder={t("Qo'shimcha eslatma")} />
       </div>
       <div className="f">
-        <label htmlFor="fImg">Rasm / chizma</label>
+        <label htmlFor="fImg">{t("Rasm / chizma")}</label>
         <div className="imgrow">
           {f.img && <img src={f.img} alt="" />}
           <label className="btn small" htmlFor="fImg" style={{ cursor: "pointer" }}>
-            Rasm tanlash
+            {t("Rasm tanlash")}
           </label>
           <input id="fImg" type="file" accept="image/*" onChange={pickImg} style={{ display: "none" }} />
           {f.img && (
             <button type="button" className="btn small danger" onClick={() => setF((s) => ({ ...s, img: null }))}>
-              Olib tashlash
+              {t("Olib tashlash")}
             </button>
           )}
         </div>
@@ -200,15 +202,15 @@ export default function JobForm({ job, isAdmin, customers, onSave, onDelete, onC
       <div className="mbtns">
         {job && isAdmin && (
           <button className="btn danger" onClick={() => onDelete(job)}>
-            O'chirish
+            {t("O'chirish")}
           </button>
         )}
         <span className="sp" />
         <button className="btn" onClick={onClose}>
-          Bekor qilish
+          {t("Bekor qilish")}
         </button>
         <button className="btn primary" onClick={submit}>
-          Saqlash
+          {t("Saqlash")}
         </button>
       </div>
     </Modal>

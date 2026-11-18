@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { sb } from "../supabase.js";
 import { FALLBACK_USERS } from "../utils.js";
 import PasswordInput from "./PasswordInput.jsx";
+import { useT } from "../i18n.jsx";
+import LangSwitch from "./LangSwitch.jsx";
 
 // Carved-wood lattice, drawn in SVG so the page needs no image file.
 const ORNAMENT = `<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'>
@@ -23,6 +25,7 @@ const SHADE = "linear-gradient(rgba(255,250,240,.35),rgba(255,250,240,.35))";
 const PHOTO = `url(${import.meta.env.BASE_URL}login-bg.jpg)`;
 
 export default function Login() {
+  const t = useT();
   const [users, setUsers] = useState(null);
   const [who, setWho] = useState("");
   const [pass, setPass] = useState("");
@@ -48,16 +51,16 @@ export default function Login() {
     e.preventDefault();
     setErr("");
     const u = (users || []).find((x) => x.username === who);
-    if (!u) return setErr("Ismingizni tanlang.");
-    if (!pass) return setErr("Parolni kiriting.");
+    if (!u) return setErr(t("Ismingizni tanlang."));
+    if (!pass) return setErr(t("Parolni kiriting."));
     setBusy(true);
     const { error } = await sb.auth.signInWithPassword({ email: u.email, password: pass });
     setBusy(false);
     if (error) {
       setErr(
         /invalid login/i.test(error.message)
-          ? "Parol noto'g'ri, yoki bu foydalanuvchi Supabase'da yaratilmagan."
-          : "Xato: " + error.message
+          ? t("Parol noto'g'ri, yoki bu foydalanuvchi Supabase'da yaratilmagan.")
+          : t("Xato") + ": " + error.message
       );
     }
     else setPass("");
@@ -71,13 +74,14 @@ export default function Login() {
         backgroundSize: "auto, cover, 120px 120px",
       }}
     >
+      <LangSwitch className="login-lang" />
       <form className="login-card" onSubmit={submit}>
-        <h1>Ish kuzatuv</h1>
-        <p className="lead">Mebel va naqsh ishlari hisobi. Davom etish uchun kiring.</p>
+        <h1>{t("Ish kuzatuv")}</h1>
+        <p className="lead">{t("Mebel va naqsh ishlari hisobi. Davom etish uchun kiring.")}</p>
         <div className="f">
-          <label htmlFor="who">Foydalanuvchi</label>
+          <label htmlFor="who">{t("Foydalanuvchi")}</label>
           <select id="who" value={who} onChange={(e) => setWho(e.target.value)} disabled={!users}>
-            <option value="">{users ? "Tanlang..." : "Yuklanmoqda..."}</option>
+            <option value="">{users ? t("Tanlang...") : t("Yuklanmoqda...")}</option>
             {(users || []).map((u) => (
               <option key={u.username} value={u.username}>
                 {u.username}
@@ -86,13 +90,13 @@ export default function Login() {
           </select>
         </div>
         <div className="f">
-          <label htmlFor="lPass">Parol</label>
+          <label htmlFor="lPass">{t("Parol")}</label>
           <PasswordInput id="lPass" autoComplete="current-password" value={pass} onChange={(e) => setPass(e.target.value)} />
         </div>
         <div className="errtxt">{err}</div>
         <div className="mbtns">
           <button className="btn primary" style={{ flex: 1, padding: "10px 14px" }} disabled={busy}>
-            Kirish
+            {t("Kirish")}
           </button>
         </div>
       </form>

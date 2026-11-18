@@ -1,8 +1,10 @@
 import { useState } from "react";
 import Icon from "./Icons.jsx";
+import { useT } from "../i18n.jsx";
 
 // Password field with an eye button to show or hide what is typed.
 export default function PasswordInput({ id, value, onChange, placeholder, autoComplete, autoFocus, ariaLabel }) {
+  const t = useT();
   const [show, setShow] = useState(false);
   return (
     <div className="pwfield">
@@ -20,8 +22,8 @@ export default function PasswordInput({ id, value, onChange, placeholder, autoCo
         type="button"
         className="eye"
         onClick={() => setShow((s) => !s)}
-        aria-label={show ? "Parolni yashirish" : "Parolni ko'rsatish"}
-        title={show ? "Parolni yashirish" : "Parolni ko'rsatish"}
+        aria-label={show ? t("Parolni yashirish") : t("Parolni ko'rsatish")}
+        title={show ? t("Parolni yashirish") : t("Parolni ko'rsatish")}
         aria-pressed={show}
       >
         <Icon name={show ? "eyeOff" : "eye"} size={18} />

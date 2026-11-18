@@ -3,17 +3,18 @@ import { STAGES, fmt, debtOf, todayStr } from "../utils.js";
 import Card from "./Card.jsx";
 import JobForm from "./JobForm.jsx";
 import ConfirmDialog from "./ConfirmDialog.jsx";
+import { useT } from "../i18n.jsx";
 
 // The main page: search, sort, "+ Yangi ish" and the four-column board.
 export default function Jobs({ data, isAdmin }) {
+  const t = useT();
   const { jobs, customers, saveJob, removeJob, removeMany, savePhone, reorder } = data;
   const [q, setQ] = useState("");
-  const [sort, setSort] = useState("manual");
   const [form, setForm] = useState(null); // { job } (job is null for a new one)
   const [confirm, setConfirm] = useState(null);
   const [bigImg, setBigImg] = useState(null);
 
-  const sortByDue = sort === "due";
+  const sortByDue = false;
   const query = q.trim().toLowerCase();
 
   function act(j, a) {
@@ -53,8 +54,8 @@ export default function Jobs({ data, isAdmin }) {
   function onDelete(j) {
     if (!isAdmin) return;
     setConfirm({
-      title: "Ishni o'chirish",
-      text: `"${j.title}" ishi hamma qurilmalardan o'chiriladi. Buni qaytarib bo'lmaydi.`,
+      title: t("Ishni o'chirish"),
+      text: t("\"{0}\" ishi hamma qurilmalardan o'chiriladi. Buni qaytarib bo'lmaydi.", j.title),
       onYes: async () => {
         setConfirm(null);
         setForm(null);
@@ -67,9 +68,9 @@ export default function Jobs({ data, isAdmin }) {
     const ids = jobs.filter((j) => j.stage === 3).map((j) => j.id);
     if (!ids.length) return;
     setConfirm({
-      title: "Tayyor ishlarni tozalash",
-      text: `Tayyor ustunidagi ${ids.length} ta ish hamma qurilmalardan o'chiriladi. Buni qaytarib bo'lmaydi.`,
-      yes: "Hammasini o'chirish",
+      title: t("Tayyor ishlarni tozalash"),
+      text: t("Tayyor ustunidagi {0} ta ish hamma qurilmalardan o'chiriladi. Buni qaytarib bo'lmaydi.", ids.length),
+      yes: t("Hammasini o'chirish"),
       onYes: async () => {
         setConfirm(null);
         await removeMany(ids);
@@ -80,21 +81,17 @@ export default function Jobs({ data, isAdmin }) {
   return (
     <>
       <div className="toolbar">
-        <input type="search" placeholder="Qidirish..." aria-label="Qidirish" value={q} onChange={(e) => setQ(e.target.value)} />
-        <select aria-label="Tartib" value={sort} onChange={(e) => setSort(e.target.value)}>
-          <option value="manual">Tartib: qo'lda</option>
-          <option value="due">Tartib: muddat</option>
-        </select>
+        <input type="search" placeholder={t("Qidirish...")} aria-label={t("Qidirish")} value={q} onChange={(e) => setQ(e.target.value)} />
         {isAdmin && (
           <div className="legend">
-            <span><i className="dot d0" />To'lanmagan</span>
-            <span><i className="dot d1" />Avans berilgan</span>
-            <span><i className="dot d2" />To'liq to'langan</span>
+            <span><i className="dot d0" />{t("To'lanmagan")}</span>
+            <span><i className="dot d1" />{t("Avans berilgan")}</span>
+            <span><i className="dot d2" />{t("To'liq to'langan")}</span>
           </div>
         )}
         <div className="spacer" />
         <button className="btn primary" onClick={() => setForm({ job: null })}>
-          + Yangi ish
+          {t("+ Yangi ish")}
         </button>
       </div>
 
@@ -102,7 +99,6 @@ export default function Jobs({ data, isAdmin }) {
         {STAGES.map((name, s) => {
           let items = jobs.filter((j) => j.stage === s);
           const total = items.length;
-          if (sortByDue) items = items.slice().sort((a, b) => (a.due || "9999").localeCompare(b.due || "9999"));
           const shown = items.filter(
             (j) => !query || (j.title + " " + j.customer + " " + (j.material || "")).toLowerCase().includes(query)
           );
@@ -110,16 +106,16 @@ export default function Jobs({ data, isAdmin }) {
             <section className="col" key={name}>
               <h2>
                 <i className="stagebar" />
-                {name}
+                {t(name)}
                 <span className="n">{total}</span>
                 {isAdmin && s === 3 && total > 0 && (
                   <button className="clear" onClick={clearDone}>
-                    Tozalash
+                    {t("Tozalash")}
                   </button>
                 )}
               </h2>
               <div className="list">
-                {shown.length === 0 && <div className="empty">{query ? "Topilmadi" : "Bo'sh"}</div>}
+                {shown.length === 0 && <div className="empty">{query ? t("Topilmadi") : t("Bo'sh")}</div>}
                 {shown.map((j) => (
                   <Card
                     key={j.id}

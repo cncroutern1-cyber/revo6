@@ -2,8 +2,10 @@ import { useEffect, useState } from "react";
 import { sb } from "./supabase.js";
 import Login from "./components/Login.jsx";
 import Tracker from "./components/Tracker.jsx";
+import { LangProvider, useT } from "./i18n.jsx";
 
-export default function App() {
+function Inner() {
+  const t = useT();
   const [ready, setReady] = useState(false);
   const [email, setEmail] = useState("");
   const [me, setMe] = useState(null); // { username, role }
@@ -44,8 +46,16 @@ export default function App() {
     };
   }, [email]);
 
-  if (!ready) return <div className="boot">Yuklanmoqda...</div>;
+  if (!ready) return <div className="boot">{t("Yuklanmoqda...")}</div>;
   if (!email) return <Login />;
-  if (!me) return <div className="boot">Yuklanmoqda...</div>;
+  if (!me) return <div className="boot">{t("Yuklanmoqda...")}</div>;
   return <Tracker isAdmin={me.role === "admin"} username={me.username} />;
+}
+
+export default function App() {
+  return (
+    <LangProvider>
+      <Inner />
+    </LangProvider>
+  );
 }

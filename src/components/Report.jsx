@@ -1,8 +1,10 @@
 import { useState } from "react";
 import Page from "./Page.jsx";
 import { STAGE_NAMES, fmt, todayStr, daysLeft, debtOf, download } from "../utils.js";
+import { useT } from "../i18n.jsx";
 
 export default function Report({ jobs, customers, onRestore, onWipe }) {
+  const t = useT();
   const [month, setMonth] = useState(todayStr().slice(0, 7));
 
   const done = jobs.filter((j) => j.done && j.done.startsWith(month));
@@ -46,53 +48,53 @@ export default function Report({ jobs, customers, onRestore, onWipe }) {
     try {
       const d = JSON.parse(await file.text());
       if (!Array.isArray(d.jobs)) throw new Error("bad");
-      if (!window.confirm(d.jobs.length + " ta ish yuklanadi. Bir xil ishlar yangilanadi, qolganlari saqlanib qoladi. Davom etasizmi?")) return;
+      if (!window.confirm(t("{0} ta ish yuklanadi. Bir xil ishlar yangilanadi, qolganlari saqlanib qoladi. Davom etasizmi?", d.jobs.length))) return;
       await onRestore(d);
     } catch {
-      window.alert("Fayl noto'g'ri.");
+      window.alert(t("Fayl noto'g'ri."));
     }
   }
 
   async function wipe() {
-    if (!window.confirm("Barcha ishlar va mijozlar hamma qurilmalardan o'chiriladi. Aniq o'chiraymi?")) return;
-    if (!window.confirm("Oxirgi marta so'rayman: qaytarib bo'lmaydi.")) return;
+    if (!window.confirm(t("Barcha ishlar va mijozlar hamma qurilmalardan o'chiriladi. Aniq o'chiraymi?"))) return;
+    if (!window.confirm(t("Oxirgi marta so'rayman: qaytarib bo'lmaydi."))) return;
     await onWipe();
   }
 
   return (
-    <Page title="Hisobot">
+    <Page title={t("Hisobot")}>
       <div className="f">
-        <label htmlFor="rMonth">Oy</label>
+        <label htmlFor="rMonth">{t("Oy")}</label>
         <input id="rMonth" type="month" value={month} onChange={(e) => setMonth(e.target.value)} />
       </div>
       <div className="stats">
-        <div className="stat"><b>{done.length}</b><span>Shu oy tugatilgan ishlar</span></div>
-        <div className="stat"><b>{created.length}</b><span>Shu oy qabul qilingan ishlar</span></div>
-        <div className="stat"><b>{fmt(sum)}</b><span>Tugatilgan ishlar summasi (so'm)</span></div>
-        <div className="stat"><b>{fmt(got)}</b><span>Shundan olingan (so'm)</span></div>
-        <div className="stat"><b>{fmt(allDebt)}</b><span>Jami qarz (so'm)</span></div>
+        <div className="stat"><b>{done.length}</b><span>{t("Shu oy tugatilgan ishlar")}</span></div>
+        <div className="stat"><b>{created.length}</b><span>{t("Shu oy qabul qilingan ishlar")}</span></div>
+        <div className="stat"><b>{fmt(sum)}</b><span>{t("Tugatilgan ishlar summasi (so'm)")}</span></div>
+        <div className="stat"><b>{fmt(got)}</b><span>{t("Shundan olingan (so'm)")}</span></div>
+        <div className="stat"><b>{fmt(allDebt)}</b><span>{t("Jami qarz (so'm)")}</span></div>
         <div className="stat">
           <b>{open.length}</b>
-          <span>Jarayondagi ishlar{late.length ? `, ${late.length} tasi kechikkan` : ""}</span>
+          <span>{t("Jarayondagi ishlar")}{late.length ? t(", {0} tasi kechikkan", late.length) : ""}</span>
         </div>
       </div>
-      <div className="sub">Shu oy eng ko'p ish bergan mijozlar</div>
-      {top.length === 0 && <div className="empty">Bu oyda tugatilgan ish yo'q</div>}
+      <div className="sub">{t("Shu oy eng ko'p ish bergan mijozlar")}</div>
+      {top.length === 0 && <div className="empty">{t("Bu oyda tugatilgan ish yo'q")}</div>}
       {top.map(([n, v]) => (
         <div className="line" key={n}>
-          <span>{n}</span>
-          <span>{v.n} ta · {fmt(v.s)} so'm</span>
+          <span>{n === "Nomsiz" ? t("Nomsiz") : n}</span>
+          <span>{t("{0} ta · {1} so'm", v.n, fmt(v.s))}</span>
         </div>
       ))}
-      <div className="sub">Ma'lumotlar</div>
+      <div className="sub">{t("Ma'lumotlar")}</div>
       <div className="mbtns" style={{ marginTop: 0 }}>
-        <button className="btn small" onClick={csv}>Excelga yuklab olish</button>
-        <button className="btn small" onClick={backup}>Zaxira nusxa</button>
-        <label className="btn small" htmlFor="fRestore" style={{ cursor: "pointer" }}>Zaxiradan yuklash</label>
+        <button className="btn small" onClick={csv}>{t("Excelga yuklab olish")}</button>
+        <button className="btn small" onClick={backup}>{t("Zaxira nusxa")}</button>
+        <label className="btn small" htmlFor="fRestore" style={{ cursor: "pointer" }}>{t("Zaxiradan yuklash")}</label>
         <input id="fRestore" type="file" accept=".json,application/json" onChange={restore} style={{ display: "none" }} />
       </div>
       <div className="mbtns">
-        <button className="btn small danger" onClick={wipe}>Hammasini tozalash</button>
+        <button className="btn small danger" onClick={wipe}>{t("Hammasini tozalash")}</button>
       </div>
     </Page>
   );

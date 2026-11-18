@@ -1,7 +1,9 @@
 import Page from "./Page.jsx";
 import { STAGE_NAMES, fmt, debtOf } from "../utils.js";
+import { useT } from "../i18n.jsx";
 
 export default function Customers({ jobs, customers, isAdmin, onPhone }) {
+  const t = useT();
   const names = new Set(Object.keys(customers));
   jobs.forEach((j) => names.add((j.customer || "").trim() || "Nomsiz"));
 
@@ -18,31 +20,31 @@ export default function Customers({ jobs, customers, isAdmin, onPhone }) {
     .sort((a, b) => b.debt - a.debt || b.js.length - a.js.length);
 
   return (
-    <Page title="Mijozlar">
-      {rows.length === 0 && <div className="empty">Hali mijozlar yo'q</div>}
+    <Page title={t("Mijozlar")}>
+      {rows.length === 0 && <div className="empty">{t("Hali mijozlar yo'q")}</div>}
       <div className="cust-grid">
       {rows.map((r) => {
         const phone = (customers[r.n] || {}).phone || "";
         return (
           <div className="cbox" key={r.n}>
             <div className="top">
-              <b>{r.n}</b>
+              <b>{r.n === "Nomsiz" ? t("Nomsiz") : r.n}</b>
               {isAdmin &&
                 (r.debt > 0 ? (
-                  <span className="debt">Qarz: {fmt(r.debt)}</span>
+                  <span className="debt">{t("Qarz: {0}", fmt(r.debt))}</span>
                 ) : (
-                  <span style={{ color: "var(--mute)", fontSize: 13 }}>Qarz yo'q</span>
+                  <span style={{ color: "var(--mute)", fontSize: 13 }}>{t("Qarz yo'q")}</span>
                 ))}
             </div>
             <div className="jl">
-              {r.js.length} ta ish{isAdmin ? ` · jami ${fmt(r.sum)} so'm` : ""}
+              {t("{0} ta ish", r.js.length)}{isAdmin ? t(" · jami {0} so'm", fmt(r.sum)) : ""}
             </div>
             <div className="jl">
               {r.js.length === 0
-                ? "Ishlar yo'q"
+                ? t("Ishlar yo'q")
                 : r.js.map((j) => (
                     <div key={j.id}>
-                      {j.title} ({STAGE_NAMES[j.stage]})
+                      {j.title} ({t(STAGE_NAMES[j.stage])})
                     </div>
                   ))}
             </div>
@@ -51,8 +53,8 @@ export default function Customers({ jobs, customers, isAdmin, onPhone }) {
                 type="tel"
                 key={r.n + phone}
                 defaultValue={phone}
-                placeholder="Telefon raqami"
-                aria-label="Telefon"
+                placeholder={t("Telefon raqami")}
+                aria-label={t("Telefon")}
                 onBlur={(e) => {
                   const v = e.target.value.trim();
                   if (v !== phone) onPhone(r.n, v);
@@ -62,7 +64,7 @@ export default function Customers({ jobs, customers, isAdmin, onPhone }) {
             {phone && (
               <div className="jl">
                 <a href={"tel:" + phone} style={{ color: "var(--accent)" }}>
-                  Qo'ng'iroq qilish
+                  {t("Qo'ng'iroq qilish")}
                 </a>
               </div>
             )}

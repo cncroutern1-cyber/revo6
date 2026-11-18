@@ -8,6 +8,9 @@ import Archive from "./Archive.jsx";
 import Customers from "./Customers.jsx";
 import Report from "./Report.jsx";
 import Users from "./Users.jsx";
+import { useT } from "../i18n.jsx";
+import Icon from "./Icons.jsx";
+import LangSwitch from "./LangSwitch.jsx";
 
 const PAGES = [
   { id: "ishlar", label: "Ishlar" },
@@ -20,6 +23,7 @@ const PAGES = [
 const fromHash = () => window.location.hash.replace("#", "");
 
 export default function Tracker({ isAdmin, username }) {
+  const t = useT();
   const data = useData();
   const online = usePresence(username);
   const [hash, setHash] = useState(fromHash());
@@ -36,9 +40,9 @@ export default function Tracker({ isAdmin, username }) {
 
   function logout() {
     setConfirm({
-      title: "Chiqish",
-      text: "Tizimdan chiqmoqchimisiz?",
-      yes: "Chiqish",
+      title: t("Chiqish"),
+      text: t("Tizimdan chiqmoqchimisiz?"),
+      yes: t("Chiqish"),
       tone: "primary",
       onYes: () => {
         setConfirm(null);
@@ -49,20 +53,24 @@ export default function Tracker({ isAdmin, username }) {
   }
 
   const { status, jobs, customers } = data;
+  const statusText = status.text.startsWith("Xato: ") ? t("Xato") + status.text.slice(4) : t(status.text);
 
   return (
     <>
       <header>
         <div className="brand">
-          Ish kuzatuv
-          <small>
-            {username} · <span className={"status" + (status.err ? " err" : "")}>{status.text}</span> ·{" "}
-            <button className="logout" onClick={logout}>
-              Chiqish
+          <div className="brand-top">
+            <span>{t("Ish kuzatuv")}</span>
+            <button className="logout" onClick={logout} title={t("Chiqish")}>
+              <Icon name="logout" size={13} />
+              {t("Chiqish")}
             </button>
+          </div>
+          <small>
+            {username} · <span className={"status" + (status.err ? " err" : "")}>{statusText}</span>
           </small>
         </div>
-        <nav className="tabs" aria-label="Sahifalar">
+        <nav className="tabs" aria-label={t("Sahifalar")}>
           {pages.map((p) => (
             <button
               key={p.id}
@@ -70,13 +78,16 @@ export default function Tracker({ isAdmin, username }) {
               aria-current={page === p.id ? "page" : undefined}
               onClick={() => (window.location.hash = p.id)}
             >
-              {p.label}
+              {t(p.label)}
             </button>
           ))}
         </nav>
-        <div className="online" title="Hozir tizimda">
-          <i className="dot d2" />
-          Onlayn: {online.length ? online.join(", ") : username}
+        <div className="hright">
+          <div className="online" title={t("Hozir tizimda")}>
+            <i className="dot d2" />
+            {t("Onlayn: {0}", online.length ? online.join(", ") : username)}
+          </div>
+          <LangSwitch />
         </div>
       </header>
 

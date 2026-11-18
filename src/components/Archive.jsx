@@ -4,9 +4,11 @@ import JobForm from "./JobForm.jsx";
 import ConfirmDialog from "./ConfirmDialog.jsx";
 import Icon from "./Icons.jsx";
 import { fmt, fmtArea, debtOf } from "../utils.js";
+import { useT } from "../i18n.jsx";
 
 // Finished jobs: ticked off in the "Tayyor" column. Can be restored, edited or (admin) deleted.
 export default function Archive({ data, isAdmin }) {
+  const t = useT();
   const { jobs, customers, saveJob, removeJob, savePhone } = data;
   const [q, setQ] = useState("");
   const [form, setForm] = useState(null);
@@ -27,8 +29,8 @@ export default function Archive({ data, isAdmin }) {
   function ask(j) {
     if (!isAdmin) return;
     setConfirm({
-      title: "Ishni o'chirish",
-      text: `"${j.title}" ishi hamma qurilmalardan o'chiriladi. Buni qaytarib bo'lmaydi.`,
+      title: t("Ishni o'chirish"),
+      text: t("\"{0}\" ishi hamma qurilmalardan o'chiriladi. Buni qaytarib bo'lmaydi.", j.title),
       onYes: async () => {
         setConfirm(null);
         setForm(null);
@@ -46,17 +48,17 @@ export default function Archive({ data, isAdmin }) {
   }
 
   return (
-    <Page title="Tugatilgan ishlar">
+    <Page title={t("Tugatilgan ishlar")}>
       <div className="arch-bar">
-        <input type="search" placeholder="Qidirish..." aria-label="Qidirish" value={q} onChange={(e) => setQ(e.target.value)} />
-        <span className="arch-count">{total} ta ish</span>
+        <input type="search" placeholder={t("Qidirish...")} aria-label={t("Qidirish")} value={q} onChange={(e) => setQ(e.target.value)} />
+        <span className="arch-count">{t("{0} ta ish", total)}</span>
       </div>
 
       {list.length === 0 && (
         <div className="empty">
           {total === 0
-            ? "Hali tugatilgan ish yo'q. \"Tayyor\" ustunidagi ish kartasida ✓ tugmasini bossangiz, ish shu yerga o'tadi."
-            : "Topilmadi"}
+            ? t("Hali tugatilgan ish yo'q. \"Tayyor\" ustunidagi ish kartasida ✓ tugmasini bossangiz, ish shu yerga o'tadi.")
+            : t("Topilmadi")}
         </div>
       )}
 
@@ -69,32 +71,32 @@ export default function Archive({ data, isAdmin }) {
               <div className="row1">
                 <span className="tag">{j.parts} ta detal</span>
                 {j.area > 0 && <span>{fmtArea(j.area)} m²</span>}
-                <span style={{ marginLeft: "auto" }}>Tugagan: {j.done || "—"}</span>
+                <span style={{ marginLeft: "auto" }}>{t("Tugagan: {0}", j.done || "—")}</span>
               </div>
               <div className="mid">
                 <div className="txt">
                   <div className="title">{j.title}</div>
                   <div className="cust">{j.customer || "—"}</div>
                 </div>
-                {j.img && <img className="thumb" src={j.img} alt="Rasm" onClick={() => setBigImg(j.img)} />}
+                {j.img && <img className="thumb" src={j.img} alt={t("Rasm")} onClick={() => setBigImg(j.img)} />}
               </div>
               {meta && <div className="meta">{meta}</div>}
               {j.note && <div className="meta">{j.note}</div>}
               {isAdmin && j.price > 0 && (
                 <div className="chips">
-                  {debt > 0 ? <span className="chip red">Qarz: {fmt(debt)}</span> : <span className="chip grn">To'langan</span>}
+                  {debt > 0 ? <span className="chip red">Qarz: {fmt(debt)}</span> : <span className="chip grn">{t("To'langan")}</span>}
                 </div>
               )}
               <div className="acts">
-                <button className="ic" onClick={() => restore(j)} title="Tayyor ustuniga qaytarish">
-                  <Icon name="left" /> Qaytarish
+                <button className="ic" onClick={() => restore(j)} title={t("Tayyor ustuniga qaytarish")}>
+                  <Icon name="left" /> {t("Qaytarish")}
                 </button>
                 <span className="sep" />
-                <button className="ic" aria-label="Tahrirlash" title="Tahrirlash" onClick={() => setForm({ job: j })}>
+                <button className="ic" aria-label={t("Tahrirlash")} title={t("Tahrirlash")} onClick={() => setForm({ job: j })}>
                   <Icon name="edit" />
                 </button>
                 {isAdmin && (
-                  <button className="ic del" aria-label="Ishni o'chirish" title="Ishni o'chirish" onClick={() => ask(j)}>
+                  <button className="ic del" aria-label={t("Ishni o'chirish")} title={t("Ishni o'chirish")} onClick={() => ask(j)}>
                     <Icon name="trash" />
                   </button>
                 )}
