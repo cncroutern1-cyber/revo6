@@ -3,12 +3,14 @@ import { STAGES, fmt, debtOf, todayStr } from "../utils.js";
 import Card from "./Card.jsx";
 import JobForm from "./JobForm.jsx";
 import ConfirmDialog from "./ConfirmDialog.jsx";
+import Filters, { NO_FILTER, passes } from "./Filters.jsx";
 
 // The main page: search, sort, "+ Yangi ish" and the four-column board.
 export default function Jobs({ data, isAdmin }) {
   const { jobs, customers, saveJob, removeJob, removeMany, savePhone, reorder } = data;
   const [q, setQ] = useState("");
   const [sort, setSort] = useState("manual");
+  const [flt, setFlt] = useState(NO_FILTER);
   const [form, setForm] = useState(null); // { job } (job is null for a new one)
   const [confirm, setConfirm] = useState(null);
   const [bigImg, setBigImg] = useState(null);
@@ -97,6 +99,9 @@ export default function Jobs({ data, isAdmin }) {
           + Yangi ish
         </button>
       </div>
+      <div className="toolbar">
+        <Filters jobs={jobs.filter((j) => j.stage < 4)} f={flt} setF={setFlt} isAdmin={isAdmin} />
+      </div>
 
       <main>
         {STAGES.map((name, s) => {
@@ -104,7 +109,9 @@ export default function Jobs({ data, isAdmin }) {
           const total = items.length;
           if (sortByDue) items = items.slice().sort((a, b) => (a.due || "9999").localeCompare(b.due || "9999"));
           const shown = items.filter(
-            (j) => !query || (j.title + " " + j.customer + " " + (j.material || "")).toLowerCase().includes(query)
+            (j) =>
+              passes(j, flt, isAdmin) &&
+              (!query || (j.title + " " + j.customer + " " + (j.material || "")).toLowerCase().includes(query))
           );
           return (
             <section className="col" key={name}>
