@@ -15,6 +15,9 @@ export default function ConfirmDialog({ title, text, yes, tone = "danger", onYes
   return (
     <div className="overlay on" style={{ zIndex: 20 }}>
       <div className="modal small" role="alertdialog" aria-modal="true" aria-label={title}>
+        <button type="button" className="xbtn" onClick={onNo} aria-label={t("Yopish")} title={t("Yopish")}>
+          ×
+        </button>
         <h3>{title}</h3>
         <p>{text}</p>
         <div className="mbtns">

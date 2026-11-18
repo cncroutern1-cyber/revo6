@@ -122,6 +122,9 @@ export default function Archive({ data, isAdmin }) {
       )}
       {bigImg && (
         <div className="overlay on lightbox" onClick={() => setBigImg(null)}>
+          <button type="button" className="xbtn light" onClick={() => setBigImg(null)} aria-label="×">
+            ×
+          </button>
           <img src={bigImg} alt="" />
         </div>
       )}

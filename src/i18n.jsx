@@ -127,6 +127,7 @@ const D = {
   "Supabase'da fayllar ombori yo'q. SQL faylining oxirgi qismini ishga tushiring.": ["В Supabase нет хранилища файлов. Выполните последнюю часть SQL-файла.", "No file storage in Supabase. Run the last part of the SQL file."],
   "Omborga yozish ruxsati yo'q. SQL faylining oxirgi qismini ishga tushiring.": ["Нет прав на запись в хранилище. Выполните последнюю часть SQL-файла.", "No permission to write to storage. Run the last part of the SQL file."],
   "Fayl hajmi Supabase limitidan katta.": ["Размер файла превышает лимит Supabase.", "File exceeds the Supabase size limit."],
+  "Yopish": ["Закрыть", "Close"],
   "Detallar kvadrati (m²)": ["Площадь деталей (м²)", "Parts area (m²)"],
   "Material": ["Материал", "Material"],
   "Tanlang yoki o'zingiz yozing": ["Выберите или впишите свой", "Pick or type your own"],
