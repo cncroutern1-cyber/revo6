@@ -8,7 +8,7 @@ import { useT } from "../i18n.jsx";
 // The main page: search, sort, "+ Yangi ish" and the four-column board.
 export default function Jobs({ data, isAdmin }) {
   const t = useT();
-  const { jobs, customers, saveJob, removeJob, removeMany, savePhone, reorder } = data;
+  const { jobs, customers, materialPrices, saveMaterialPrice, saveJob, removeJob, removeMany, savePhone, reorder } = data;
   const [q, setQ] = useState("");
   const [form, setForm] = useState(null); // { job } (job is null for a new one)
   const [confirm, setConfirm] = useState(null);
@@ -120,6 +120,8 @@ export default function Jobs({ data, isAdmin }) {
           job={form.job}
           isAdmin={isAdmin}
           customers={customers}
+          materialPrices={materialPrices}
+          onSaveMaterialPrice={saveMaterialPrice}
           onSave={onSave}
           onDelete={onDelete}
           onClose={() => setForm(null)}

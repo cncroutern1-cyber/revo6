@@ -7,7 +7,7 @@ import { sb } from "../supabase.js";
 
 const MATERIALS = ["LDSP", "MDF", "Massiv", "Fanera"];
 
-export default function JobForm({ job, isAdmin, customers, onSave, onDelete, onClose }) {
+export default function JobForm({ job, isAdmin, customers, materialPrices = {}, onSaveMaterialPrice, onSave, onDelete, onClose }) {
   const t = useT();
   const [f, setF] = useState({
     title: job?.title || "",
@@ -25,6 +25,7 @@ export default function JobForm({ job, isAdmin, customers, onSave, onDelete, onC
     filePath: job?.filePath || "",
     matOurs: !!job?.matOurs,
     matPrice: job?.matPrice || "",
+    matRate: "",
     advance: job?.advance || "",
     due: job?.due || "",
     stage: job ? job.stage : 0,
@@ -41,7 +42,12 @@ export default function JobForm({ job, isAdmin, customers, onSave, onDelete, onC
   const rateN = parseFloat(f.rate) || 0;
   const service = rateN > 0 ? Math.round(areaN * rateN) : parseFloat(f.price) || 0;
   const hasMat = f.material.trim() !== "";
-  const matN = hasMat && f.matOurs ? parseFloat(f.matPrice) || 0 : 0;
+  const matKey = Object.keys(materialPrices).find((k) => k.toLowerCase() === f.material.trim().toLowerCase());
+  const listRate = matKey ? materialPrices[matKey] : 0;
+  const matRateN = parseFloat(f.matRate) || 0;
+  const matCost = matRateN > 0 ? Math.round(areaN * matRateN) : parseFloat(f.matPrice) || 0;
+  const matN = hasMat && f.matOurs ? matCost : 0;
+  const [saved, setSaved] = useState(false);
   const priceN = service + matN;
   const advN = parseFloat(f.advance) || 0;
   const rest = priceN - advN;
@@ -107,7 +113,7 @@ export default function JobForm({ job, isAdmin, customers, onSave, onDelete, onC
     if (isAdmin) {
       j.rate = Math.max(0, rateN);
       j.matOurs = hasMat && !!f.matOurs;
-      j.matPrice = j.matOurs ? Math.max(0, parseFloat(f.matPrice) || 0) : 0;
+      j.matPrice = j.matOurs ? Math.max(0, matCost) : 0;
       j.price = Math.max(0, priceN);
       j.advance = Math.max(0, parseFloat(f.advance) || 0);
     }
@@ -191,7 +197,35 @@ export default function JobForm({ job, isAdmin, customers, onSave, onDelete, onC
                 {t("Material bizdan beriladi")}
               </label>
               {f.matOurs && (
-                <input id="fMatPrice" type="number" min="0" value={f.matPrice} onChange={set("matPrice")} placeholder={t("Material narxi (so'm)")} aria-label={t("Material narxi (so'm)")} />
+                <>
+                  <div className="two">
+                    <div>
+                      <label htmlFor="fMatRate">{t("Material narxi (so'm / m²)")}</label>
+                      <input id="fMatRate" type="number" min="0" value={f.matRate} onChange={(e) => { setSaved(false); set("matRate")(e); }} placeholder={listRate ? fmt(listRate) : "0"} />
+                    </div>
+                    <div>
+                      <label>{t("Material narxi")}</label>
+                      {matRateN > 0 ? (
+                        <div className="calcbox">{fmtArea(areaN)} m² × {fmt(matRateN)} = <b>{fmt(matCost)}</b></div>
+                      ) : (
+                        <input id="fMatPrice" type="number" min="0" value={f.matPrice} onChange={set("matPrice")} placeholder={t("Material narxi (so'm)")} aria-label={t("Material narxi (so'm)")} />
+                      )}
+                    </div>
+                  </div>
+                  <div className="matlist">
+                    {listRate > 0 && matRateN !== listRate && (
+                      <button type="button" className="btn small" onClick={() => setF((s) => ({ ...s, matRate: String(listRate) }))}>
+                        {t("Ro'yxatdagi narx")}: {fmt(listRate)}
+                      </button>
+                    )}
+                    {matRateN > 0 && matRateN !== listRate && (
+                      <button type="button" className="btn small" onClick={() => { onSaveMaterialPrice && onSaveMaterialPrice(f.material, matRateN); setSaved(true); }}>
+                        {t("Narxni ro'yxatga saqlash")}
+                      </button>
+                    )}
+                    {saved && <span className="meta">✓ {t("Saqlandi")}</span>}
+                  </div>
+                </>
               )}
             </div>
           )}

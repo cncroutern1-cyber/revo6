@@ -282,3 +282,5 @@ header,.toolbar,main,.page{padding-left:max(20px,env(safe-area-inset-left,0px));
 .sw.on{border-color:var(--accent);background:var(--accent-soft);font-weight:600}
 .fname{font-size:13px;color:var(--mute);word-break:break-all}
 .filelink{display:block;text-decoration:none;color:var(--accent)}
+.matlist{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:8px}
+.f .two>div>label{display:block}

@@ -6,6 +6,14 @@ import { toRow, fromRow, sortJobs, uid } from "./utils.js";
 export function useData() {
   const [jobs, setJobs] = useState([]);
   const [customers, setCustomers] = useState({});
+  // Material price list (so'm per m²) set by the admin. Kept in the "materials" table; falls back to this browser if the table is missing.
+  const [materialPrices, setMaterialPrices] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem("ish-kuzatuv-mat") || "{}");
+    } catch (e) {
+      return {};
+    }
+  });
   const [status, setStatus] = useState({ text: "Yuklanmoqda...", err: false });
   const timer = useRef();
 
@@ -20,6 +28,15 @@ export function useData() {
       return;
     }
     setJobs(sortJobs(a.data.map(fromRow)));
+    try {
+      const m = await sb.from("materials").select("*");
+      if (!m.error && m.data) {
+        const mp = {};
+        m.data.forEach((x) => (mp[x.name] = Number(x.price) || 0));
+        setMaterialPrices(mp);
+        localStorage.setItem("ish-kuzatuv-mat", JSON.stringify(mp));
+      }
+    } catch (e) {}
     const map = {};
     b.data.forEach((c) => (map[c.name] = { phone: c.phone || "" }));
     setCustomers(map);
@@ -104,6 +121,20 @@ export function useData() {
     return run(sb.from("jobs").delete().in("id", ids));
   };
 
+  const saveMaterialPrice = async (name, price) => {
+    name = (name || "").trim();
+    if (!name) return;
+    setMaterialPrices((m) => {
+      const n = { ...m, [name]: price };
+      try {
+        localStorage.setItem("ish-kuzatuv-mat", JSON.stringify(n));
+      } catch (e) {}
+      return n;
+    });
+    const { error } = await sb.from("materials").upsert({ name, price });
+    if (error) console.warn("materials jadvali yo'q — supabase-yangilash-area.sql ni ishga tushiring", error.message);
+  };
+
   const savePhone = (name, phone) => {
     setCustomers((c) => ({ ...c, [name]: { ...(c[name] || {}), phone } }));
     return run(sb.from("customers").upsert({ name, phone }));
@@ -152,5 +183,5 @@ export function useData() {
     await fetchAll();
   };
 
-  return { jobs, customers, status, saveJob, removeJob, removeMany, savePhone, reorder, restore, wipe };
+  return { jobs, customers, materialPrices, saveMaterialPrice, status, saveJob, removeJob, removeMany, savePhone, reorder, restore, wipe };
 }
