@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { sb } from "../supabase.js";
 import { useData } from "../useData.js";
+import { usePresence } from "../usePresence.js";
 import ConfirmDialog from "./ConfirmDialog.jsx";
 import Jobs from "./Jobs.jsx";
 import Archive from "./Archive.jsx";
@@ -20,6 +21,7 @@ const fromHash = () => window.location.hash.replace("#", "");
 
 export default function Tracker({ isAdmin, username }) {
   const data = useData();
+  const online = usePresence(username);
   const [hash, setHash] = useState(fromHash());
   const [confirm, setConfirm] = useState(null);
 
@@ -72,6 +74,10 @@ export default function Tracker({ isAdmin, username }) {
             </button>
           ))}
         </nav>
+        <div className="online" title="Hozir tizimda">
+          <i className="dot d2" />
+          Onlayn: {online.length ? online.join(", ") : username}
+        </div>
       </header>
 
       {page === "ishlar" && <Jobs data={data} isAdmin={isAdmin} />}
