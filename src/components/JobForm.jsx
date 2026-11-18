@@ -68,11 +68,17 @@ export default function JobForm({ job, isAdmin, customers, materialPrices = {}, 
     const file = e.target.files[0];
     e.target.value = "";
     if (!file) return;
-    if (file.size > 20 * 1024 * 1024) return setUp(t("Fayl 20 MB dan katta"));
+    if (file.size > 50 * 1024 * 1024) return setUp(t("Fayl 50 MB dan katta"));
     setUp(t("Yuklanmoqda..."));
-    const path = uid() + "-" + file.name.replace(/[^\w.\-]+/g, "_");
-    const { error } = await sb.storage.from("job-files").upload(path, file);
-    if (error) return setUp(t("Yuklab bo'lmadi") + ": " + error.message);
+    // Any file type is accepted; the name is made safe for storage and the original name is kept for display.
+    const ext = (file.name.match(/\.[A-Za-z0-9]{1,8}$/) || [""])[0];
+    const path = uid() + ext.toLowerCase();
+    const { error } = await sb.storage.from("job-files").upload(path, file, { contentType: file.type || "application/octet-stream" });
+    if (error) {
+      const m = error.message || "";
+      const hint = /bucket/i.test(m) ? t("Supabase'da fayllar ombori yo'q. SQL faylining oxirgi qismini ishga tushiring.") : /row-level|policy|unauthorized/i.test(m) ? t("Omborga yozish ruxsati yo'q. SQL faylining oxirgi qismini ishga tushiring.") : /size|large|exceed/i.test(m) ? t("Fayl hajmi Supabase limitidan katta.") : m;
+      return setUp("!" + t("Yuklab bo'lmadi") + ": " + hint);
+    }
     setUp("");
     setF((s) => ({ ...s, fileName: file.name, filePath: path }));
   }
@@ -363,7 +369,7 @@ export default function JobForm({ job, isAdmin, customers, materialPrices = {}, 
             </button>
           )}
         </div>
-        {up && <div className="meta">{up}</div>}
+        {up && <div className={up[0] === "!" ? "uperr" : "meta"}>{up.replace(/^!/, "")}</div>}
       </div>
       <div className="f">
         <div className="imgrow">

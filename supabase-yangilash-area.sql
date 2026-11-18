@@ -10,7 +10,8 @@ alter table public.jobs add column if not exists file_name text default '';
 alter table public.jobs add column if not exists file_path text default '';
 
 -- Fayllar uchun xotira (Storage)
-insert into storage.buckets (id, name, public) values ('job-files', 'job-files', true) on conflict (id) do nothing;
+insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types) values ('job-files', 'job-files', true, 52428800, null)
+  on conflict (id) do update set public = true, file_size_limit = 52428800, allowed_mime_types = null;
 drop policy if exists "job-files upload" on storage.objects;
 create policy "job-files upload" on storage.objects for insert to authenticated with check (bucket_id = 'job-files');
 drop policy if exists "job-files read" on storage.objects;
@@ -25,3 +26,5 @@ create policy "materials_auth_all" on public.materials for all to authenticated 
 -- Xizmat narxi usuli (kvadrat / list)
 alter table public.jobs add column if not exists price_mode text default '';
 alter table public.jobs add column if not exists lists numeric default 0;
+drop policy if exists "job-files update" on storage.objects;
+create policy "job-files update" on storage.objects for update to authenticated using (bucket_id = 'job-files') with check (bucket_id = 'job-files');
