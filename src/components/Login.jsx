@@ -53,7 +53,13 @@ export default function Login() {
     setBusy(true);
     const { error } = await sb.auth.signInWithPassword({ email: u.email, password: pass });
     setBusy(false);
-    if (error) setErr("Parol noto'g'ri.");
+    if (error) {
+      setErr(
+        /invalid login/i.test(error.message)
+          ? "Parol noto'g'ri, yoki bu foydalanuvchi Supabase'da yaratilmagan."
+          : "Xato: " + error.message
+      );
+    }
     else setPass("");
   }
 
