@@ -13,6 +13,21 @@ export default function Jobs({ data, isAdmin }) {
   const [form, setForm] = useState(null); // { job } (job is null for a new one)
   const [confirm, setConfirm] = useState(null);
   const [bigImg, setBigImg] = useState(null);
+  // "Kichraytirish": every card shrinks to one line; a single card can still be opened with its own button.
+  const [compact, setCompact] = useState(() => {
+    try {
+      return localStorage.getItem("ish-kuzatuv-compact") === "1";
+    } catch (e) {
+      return false;
+    }
+  });
+  const toggleCompact = () =>
+    setCompact((c) => {
+      try {
+        localStorage.setItem("ish-kuzatuv-compact", c ? "0" : "1");
+      } catch (e) {}
+      return !c;
+    });
 
   const sortByDue = false;
   const query = q.trim().toLowerCase();
@@ -76,6 +91,9 @@ export default function Jobs({ data, isAdmin }) {
           </div>
         )}
         <div className="spacer" />
+        <button className="btn" onClick={toggleCompact} title={compact ? t("Hamma ishni kattalashtirish") : t("Hamma ishni kichraytirish")}>
+          {compact ? t("⤢ Kattalashtirish") : t("⤡ Kichraytirish")}
+        </button>
         <button className="btn primary" onClick={() => setForm({ job: null })}>
           {t("+ Yangi ish")}
         </button>
@@ -99,7 +117,8 @@ export default function Jobs({ data, isAdmin }) {
                 {shown.length === 0 && <div className="empty">{query ? t("Topilmadi") : t("Bo'sh")}</div>}
                 {shown.map((j) => (
                   <Card
-                    key={j.id}
+                    key={j.id + (compact ? "-c" : "")}
+                    compact={compact}
                     j={j}
                     idx={items.indexOf(j)}
                     count={items.length}

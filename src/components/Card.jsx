@@ -1,10 +1,13 @@
+import { useState } from "react";
 import { sb } from "../supabase.js";
 import { PAYN, fmt, fmtArea, daysLeft, payState, debtOf } from "../utils.js";
 import Icon from "./Icons.jsx";
 import { useT } from "../i18n.jsx";
 
-export default function Card({ j, idx, count, sortByDue, isAdmin, act }) {
+export default function Card({ j, idx, count, sortByDue, isAdmin, act, compact }) {
   const t = useT();
+  const [own, setOwn] = useState(null);
+  const small = own === null ? !!compact : own;
   const ps = payState(j);
   const debt = debtOf(j);
 
@@ -33,9 +36,33 @@ export default function Card({ j, idx, count, sortByDue, isAdmin, act }) {
 
   const meta = [j.material, j.color ? t(j.color) : "", j.thick ? j.thick + " mm" : "", j.dims].filter(Boolean).join(" · ");
 
+  if (small) {
+    return (
+      <div className={"card mini" + (late ? " late" : "")}>
+        {isAdmin && <i className={"dot d" + ps} title={t(PAYN[ps])} />}
+        <div className="txt">
+          <div className="title">{j.title}</div>
+          <div className="cust">{[j.customer, j.area > 0 ? fmtArea(j.area) + " m²" : ""].filter(Boolean).join(" · ") || "—"}</div>
+        </div>
+        {late && <span className="chip red">!</span>}
+        {j.stage < 3 && (
+          <button className="ic go" aria-label={t("Keyingi bosqich")} title={t("Keyingi bosqich")} onClick={() => act(j, "next")}>
+            <Icon name="right" />
+          </button>
+        )}
+        <button className="ic" aria-label={t("Kattalashtirish")} title={t("Kattalashtirish")} onClick={() => setOwn(false)}>
+          +
+        </button>
+      </div>
+    );
+  }
+
   return (
     <div className={"card" + (late ? " late" : "")}>
       <div className="row1">
+        <button className="ic shrink" aria-label={t("Kichraytirish")} title={t("Kichraytirish")} onClick={() => setOwn(true)}>
+          –
+        </button>
         <span className="tag">{t("{0} ta detal", j.parts)}</span>
         {j.area > 0 && <span>{fmtArea(j.area)} m²</span>}
         {isAdmin && (
