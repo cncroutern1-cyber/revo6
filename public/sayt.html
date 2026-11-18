@@ -286,13 +286,13 @@ input.bad,textarea.bad{border-color:#A5301F}
 
 <div class="view" id="contact" data-t="Aloqa — Revo"><div class="wrap page"><div class="split">
 <div data-aos="fade-right" data-aos-delay="0"><span class="eyebrow">Aloqa</span><h1 style="font-size:clamp(2.2rem,4.5vw,3.4rem)">Biz bilan bog‘laning</h1>
-<p class="lead">Buyurtma yoki savol uchun qo‘ng‘iroq qiling yoki xabar qoldiring. Xabaringiz WhatsApp orqali bizga yetib boradi.</p>
+<p class="lead">Buyurtma yoki savol uchun qo‘ng‘iroq qiling yoki xabar qoldiring. Xabaringiz Telegram orqali bizga yetib boradi.</p>
 <form id="f" novalidate>
 <label>Murojaat turi<select id="t"><option>Shirma buyurtma qilish</option><option>Rover (CNC) xizmati</option><option>Boshqa savol</option></select></label>
 <label>Ismingiz<input id="n" autocomplete="name" placeholder="Ism va familiya"><span class="ferr" id="en" role="alert"></span></label>
 <label>Telefon raqamingiz<input id="c" type="tel" inputmode="tel" autocomplete="tel" placeholder="+998 90 123 45 67"><span class="ferr" id="ec" role="alert"></span></label>
 <label>Xabaringiz<textarea id="m" placeholder="Qaysi shirma kerak? O‘lcham va rangini yozing."></textarea><span class="ferr" id="em" role="alert"></span></label>
-<div><button type="button" class="btn" id="s">WhatsApp orqali yuborish</button></div>
+<div><input id="hp" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0"><button type="button" class="btn" id="s">Telegram orqali yuborish</button></div>
 <p id="msg" role="status"></p></form></div>
 <div data-aos="fade-left" data-aos-delay="150">
 <div class="ccards">
@@ -393,8 +393,19 @@ setErr("ec","c",c.replace(/\D/g,"").length<9?"Telefon raqamini to‘liq kiriting
 setErr("em","m",m.length<5?"Xabaringizni yozing.":"");
 if(n.length<2||c.replace(/\D/g,"").length<9||m.length<5){out.textContent="Iltimos, belgilangan maydonlarni to‘ldiring.";return}
 var t="Assalomu alaykum! ["+tp+"]\nMen "+n+". Telefonim: "+c+".\n"+m;
-window.open("https://wa.me/998993242299?text="+encodeURIComponent(t),"_blank","noopener");
-out.className="okmsg";out.textContent="WhatsApp ochildi. Xabarni yuborishni tasdiqlang."});
+var btn=$("s"),old=btn.textContent;btn.disabled=true;btn.textContent="Yuborilmoqda...";
+function fallback(){
+ /* Server (bot) sozlanmagan yoki ishlamadi: xabarni nusxalab, Telegram'dagi chatni ochamiz. */
+ try{navigator.clipboard.writeText(t).catch(function(){})}catch(x){}
+ window.open("https://t.me/+998993242299","_blank","noopener");
+ out.className="okmsg";out.textContent="Xabar nusxalandi. Telegram ochildi — xabarni joylashtirib (Paste) yuboring."}
+fetch("/api/telegram",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({name:n,phone:c,topic:tp,message:m,website:($("hp")||{}).value||""})})
+ .then(function(r){return r.json().then(function(j){return{ok:r.ok&&j.ok}},function(){return{ok:false}})})
+ .then(function(r){
+  if(r.ok){out.className="okmsg";out.textContent="Xabaringiz Telegram orqali yuborildi. Tez orada bog‘lanamiz.";$("m").value=""}
+  else fallback()})
+ .catch(fallback)
+ .then(function(){btn.disabled=false;btn.textContent=old})});
 ["n","c","m"].forEach(function(k){$(k).addEventListener("input",function(){setErr("e"+k,k,"")})});
 $("cpy").addEventListener("click",function(){var b=this,num="+998 99 324 22 99";
 function done(){b.textContent="Nusxalandi ✓";setTimeout(function(){b.textContent="Raqamni nusxalash"},1800)}
