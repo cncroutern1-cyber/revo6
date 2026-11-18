@@ -23,6 +23,8 @@ export default function Jobs({ data, isAdmin }) {
     } else if (a === "back" && j.stage > 0) {
       const s = j.stage - 1;
       saveJob({ ...j, stage: s, done: "", pos: Date.now() });
+    } else if (a === "finish") {
+      saveJob({ ...j, stage: 4, done: j.done || todayStr(), pos: Date.now() });
     } else if (a === "up") reorder(j, -1);
     else if (a === "down") reorder(j, 1);
     else if (a === "edit") setForm({ job: j });

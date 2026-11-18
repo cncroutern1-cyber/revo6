@@ -1,6 +1,8 @@
 import { useState } from "react";
 import Modal from "./Modal.jsx";
-import { STAGES, uid, todayStr, resizeImg } from "../utils.js";
+import { STAGE_NAMES, uid, todayStr, resizeImg, fmt } from "../utils.js";
+
+const MATERIALS = ["LDSP", "MDF", "Massiv", "Fanera"];
 
 export default function JobForm({ job, isAdmin, customers, onSave, onDelete, onClose }) {
   const [f, setF] = useState({
@@ -8,7 +10,7 @@ export default function JobForm({ job, isAdmin, customers, onSave, onDelete, onC
     customer: job?.customer || "",
     phone: job && customers[job.customer] ? customers[job.customer].phone || "" : "",
     parts: job?.parts || 1,
-    size: job?.size || "katta",
+    area: job?.area || "",
     material: job?.material || "",
     thick: job?.thick || "",
     dims: job?.dims || "",
@@ -22,6 +24,11 @@ export default function JobForm({ job, isAdmin, customers, onSave, onDelete, onC
   const set = (k) => (e) => setF((s) => ({ ...s, [k]: e.target.value }));
 
   const names = Object.keys(customers);
+
+  // Price minus advance, shown as soon as either is typed.
+  const priceN = parseFloat(f.price) || 0;
+  const advN = parseFloat(f.advance) || 0;
+  const rest = priceN - advN;
 
   function pickCustomer(e) {
     const v = e.target.value;
@@ -46,6 +53,7 @@ export default function JobForm({ job, isAdmin, customers, onSave, onDelete, onC
       created: todayStr(),
       done: "",
       stage: 0,
+      size: "katta",
       price: 0,
       advance: 0,
       pos: Date.now(),
@@ -55,8 +63,8 @@ export default function JobForm({ job, isAdmin, customers, onSave, onDelete, onC
       title,
       customer: f.customer.trim(),
       parts: Math.max(1, parseInt(f.parts) || 1),
-      size: f.size,
-      material: f.material,
+      area: Math.max(0, parseFloat(f.area) || 0),
+      material: f.material.trim(),
       thick: String(f.thick || ""),
       dims: f.dims.trim(),
       due: f.due,
@@ -68,7 +76,7 @@ export default function JobForm({ job, isAdmin, customers, onSave, onDelete, onC
       j.advance = Math.max(0, parseFloat(f.advance) || 0);
     }
     if (j.stage !== stage) {
-      j = { ...j, stage, done: stage === 3 ? todayStr() : "", pos: Date.now() };
+      j = { ...j, stage, done: stage >= 3 ? j.done || todayStr() : "", pos: Date.now() };
     }
     onSave(j, f.phone.trim());
   }
@@ -100,24 +108,19 @@ export default function JobForm({ job, isAdmin, customers, onSave, onDelete, onC
           <input id="fParts" type="number" min="1" value={f.parts} onChange={set("parts")} />
         </div>
         <div className="f">
-          <label htmlFor="fSize">Ish hajmi</label>
-          <select id="fSize" value={f.size} onChange={set("size")}>
-            <option value="katta">Katta ish</option>
-            <option value="kichik">Kichik ish</option>
-          </select>
+          <label htmlFor="fArea">Detallar kvadrati (m²)</label>
+          <input id="fArea" type="number" min="0" step="0.01" inputMode="decimal" value={f.area} onChange={set("area")} placeholder="0" />
         </div>
       </div>
       <div className="two">
         <div className="f">
           <label htmlFor="fMat">Material</label>
-          <select id="fMat" value={f.material} onChange={set("material")}>
-            <option value="">—</option>
-            <option>LDSP</option>
-            <option>MDF</option>
-            <option>Massiv</option>
-            <option>Fanera</option>
-            <option>Boshqa</option>
-          </select>
+          <input id="fMat" type="text" list="matList" value={f.material} onChange={set("material")} placeholder="Tanlang yoki o'zingiz yozing" autoComplete="off" />
+          <datalist id="matList">
+            {MATERIALS.map((m) => (
+              <option key={m} value={m} />
+            ))}
+          </datalist>
         </div>
         <div className="f">
           <label htmlFor="fThick">Qalinligi (mm)</label>
@@ -129,16 +132,35 @@ export default function JobForm({ job, isAdmin, customers, onSave, onDelete, onC
         <input id="fDims" type="text" value={f.dims} onChange={set("dims")} placeholder="Masalan: 2100×600" />
       </div>
       {isAdmin && (
-        <div className="two">
-          <div className="f">
-            <label htmlFor="fPrice">Narx (so'm)</label>
-            <input id="fPrice" type="number" min="0" value={f.price} onChange={set("price")} placeholder="0" />
+        <>
+          <div className="two">
+            <div className="f">
+              <label htmlFor="fPrice">Narx (so'm)</label>
+              <input id="fPrice" type="number" min="0" value={f.price} onChange={set("price")} placeholder="0" />
+            </div>
+            <div className="f">
+              <label htmlFor="fAdv">Olingan avans (so'm)</label>
+              <input id="fAdv" type="number" min="0" value={f.advance} onChange={set("advance")} placeholder="0" />
+            </div>
           </div>
-          <div className="f">
-            <label htmlFor="fAdv">Olingan avans (so'm)</label>
-            <input id="fAdv" type="number" min="0" value={f.advance} onChange={set("advance")} placeholder="0" />
-          </div>
-        </div>
+          {(priceN > 0 || advN > 0) && (
+            <div className={"rest" + (rest < 0 ? " bad" : rest === 0 ? " ok" : "")} role="status">
+              {rest < 0 ? (
+                <>Avans narxdan {fmt(-rest)} so'm ko'p. Summalarni tekshiring.</>
+              ) : rest === 0 ? (
+                <>To'liq to'langan</>
+              ) : (
+                <>
+                  Qolgan to'lov: <b>{fmt(rest)} so'm</b>
+                  <span className="calc">
+                    {" "}
+                    ({fmt(priceN)} − {fmt(advN)})
+                  </span>
+                </>
+              )}
+            </div>
+          )}
+        </>
       )}
       <div className="two">
         <div className="f">
@@ -148,7 +170,7 @@ export default function JobForm({ job, isAdmin, customers, onSave, onDelete, onC
         <div className="f">
           <label htmlFor="fStage">Bosqich</label>
           <select id="fStage" value={f.stage} onChange={set("stage")}>
-            {STAGES.map((s, i) => (
+            {STAGE_NAMES.map((s, i) => (
               <option key={s} value={i}>
                 {s}
               </option>

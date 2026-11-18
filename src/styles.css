@@ -220,3 +220,15 @@ header,.toolbar,main,.page{padding-left:max(20px,env(safe-area-inset-left,0px));
   .tab{min-height:38px}
   .eye{padding:9px}
 }
+
+/* price minus advance, finished jobs */
+.rest{margin:-2px 0 12px;padding:9px 12px;border-radius:6px;background:#f1f3f7;color:#344054;font-size:13.5px}
+.rest b{font-weight:700;color:var(--ink)}
+.rest .calc{color:var(--mute);font-size:12.5px}
+.rest.ok{background:var(--green-soft);color:var(--green);font-weight:600}
+.rest.bad{background:var(--red-soft);color:var(--red)}
+.ic.done{background:var(--green);color:#fff;border-color:var(--green)}
+.ic.done:hover:not(:disabled){background:#15603a;color:#fff;border-color:#15603a}
+.arch-bar{display:flex;align-items:center;gap:12px;margin-bottom:14px;flex-wrap:wrap}
+.arch-bar input[type=search]{max-width:280px}
+.arch-count{color:var(--mute);font-size:13px}

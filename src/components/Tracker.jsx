@@ -3,12 +3,14 @@ import { sb } from "../supabase.js";
 import { useData } from "../useData.js";
 import ConfirmDialog from "./ConfirmDialog.jsx";
 import Jobs from "./Jobs.jsx";
+import Archive from "./Archive.jsx";
 import Customers from "./Customers.jsx";
 import Report from "./Report.jsx";
 import Users from "./Users.jsx";
 
 const PAGES = [
   { id: "ishlar", label: "Ishlar" },
+  { id: "tugatilgan", label: "Tugatilgan ishlar" },
   { id: "mijozlar", label: "Mijozlar" },
   { id: "hisobot", label: "Hisobot", admin: true },
   { id: "foydalanuvchilar", label: "Foydalanuvchilar", admin: true },
@@ -73,6 +75,7 @@ export default function Tracker({ isAdmin, username }) {
       </header>
 
       {page === "ishlar" && <Jobs data={data} isAdmin={isAdmin} />}
+      {page === "tugatilgan" && <Archive data={data} isAdmin={isAdmin} />}
       {page === "mijozlar" && <Customers jobs={jobs} customers={customers} isAdmin={isAdmin} onPhone={data.savePhone} />}
       {page === "hisobot" && isAdmin && (
         <Report jobs={jobs} customers={customers} onRestore={data.restore} onWipe={data.wipe} />

@@ -1,4 +1,4 @@
-import { PAYN, fmt, daysLeft, payState, debtOf } from "../utils.js";
+import { PAYN, fmt, fmtArea, daysLeft, payState, debtOf } from "../utils.js";
 import Icon from "./Icons.jsx";
 
 export default function Card({ j, idx, count, sortByDue, isAdmin, act }) {
@@ -31,10 +31,10 @@ export default function Card({ j, idx, count, sortByDue, isAdmin, act }) {
   const meta = [j.material, j.thick ? j.thick + " mm" : "", j.dims].filter(Boolean).join(" · ");
 
   return (
-    <div className={"card " + j.size + (late ? " late" : "")}>
+    <div className={"card" + (late ? " late" : "")}>
       <div className="row1">
-        <span className="tag">{j.size === "katta" ? "Katta ish" : "Kichik ish"}</span>
-        <span>{j.parts} ta detal</span>
+        <span className="tag">{j.parts} ta detal</span>
+        {j.area > 0 && <span>{fmtArea(j.area)} m²</span>}
         {isAdmin && (
           <button className="pay" title={PAYN[ps]} aria-label={PAYN[ps]} onClick={() => act(j, "edit")}>
             <i className={"dot d" + ps} />
@@ -86,9 +86,20 @@ export default function Card({ j, idx, count, sortByDue, isAdmin, act }) {
             <Icon name="trash" />
           </button>
         )}
-        <button className="ic go" disabled={j.stage === 3} aria-label="Keyingi bosqich" title="Keyingi bosqich" onClick={() => act(j, "next")}>
-          <Icon name="right" />
-        </button>
+        {j.stage < 3 ? (
+          <button className="ic go" aria-label="Keyingi bosqich" title="Keyingi bosqich" onClick={() => act(j, "next")}>
+            <Icon name="right" />
+          </button>
+        ) : (
+          <button
+            className="ic done"
+            aria-label="Tugatilgan ishlarga o'tkazish"
+            title="Tugatildi: Tugatilgan ishlar sahifasiga o'tkazish"
+            onClick={() => act(j, "finish")}
+          >
+            <Icon name="check" size={16} />
+          </button>
+        )}
       </div>
     </div>
   );

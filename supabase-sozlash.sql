@@ -6,6 +6,7 @@ create table if not exists public.jobs (
   customer text default '',
   parts int default 1,
   size text default 'katta',
+  area numeric default 0,
   stage int default 0,
   material text default '',
   thick text default '',

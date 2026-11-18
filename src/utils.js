@@ -1,4 +1,6 @@
 export const STAGES = ["Navbatda", "Chizilmoqda", "O'yilmoqda", "Tayyor"];
+// Stage 4 = ticked off as finished (shown on the "Tugatilgan ishlar" page, not on the board).
+export const STAGE_NAMES = [...STAGES, "Tugatilgan"];
 export const PAYN = ["To'lanmagan", "Avans berilgan", "To'liq to'langan"];
 
 // Used on the login page only if the "profiles" table can't be read yet (before supabase-foydalanuvchilar.sql is run).
@@ -26,6 +28,8 @@ export const daysLeft = (due) =>
 export const payState = (j) =>
   j.price > 0 ? (j.advance >= j.price ? 2 : j.advance > 0 ? 1 : 0) : j.advance > 0 ? 1 : 0;
 
+export const fmtArea = (n) => String(Math.round((n || 0) * 100) / 100);
+
 export const debtOf = (j) => Math.max(0, (j.price || 0) - (j.advance || 0));
 
 export const sortJobs = (list) => list.slice().sort((a, b) => a.pos - b.pos);
@@ -49,6 +53,8 @@ export function toRow(j) {
     done: j.done || "",
     img: j.img || null,
     pos: j.pos || Date.now(),
+    // "area" is written only when the column exists in the database (or a value is entered), so older databases keep working.
+    ...(j.area > 0 || j.hadArea ? { area: j.area || 0 } : {}),
   };
 }
 
@@ -60,6 +66,8 @@ export function fromRow(r) {
     price: Number(r.price),
     advance: Number(r.advance),
     pos: Number(r.pos),
+    area: Number(r.area) || 0,
+    hadArea: "area" in r,
   };
 }
 

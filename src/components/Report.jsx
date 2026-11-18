@@ -1,6 +1,6 @@
 import { useState } from "react";
 import Page from "./Page.jsx";
-import { STAGES, fmt, todayStr, daysLeft, debtOf, download } from "../utils.js";
+import { STAGE_NAMES, fmt, todayStr, daysLeft, debtOf, download } from "../utils.js";
 
 export default function Report({ jobs, customers, onRestore, onWipe }) {
   const [month, setMonth] = useState(todayStr().slice(0, 7));
@@ -26,9 +26,9 @@ export default function Report({ jobs, customers, onRestore, onWipe }) {
 
   function csv() {
     const q = (v) => '"' + String(v == null ? "" : v).replace(/"/g, '""') + '"';
-    const head = ["Ish", "Mijoz", "Telefon", "Bosqich", "Detal", "Hajm", "Material", "Qalinlik", "O'lcham", "Narx", "Avans", "Qarz", "Muddat", "Qabul sanasi", "Tayyor bo'lgan sana", "Izoh"];
+    const head = ["Ish", "Mijoz", "Telefon", "Bosqich", "Detal", "Kvadrat (m2)", "Material", "Qalinlik", "O'lcham", "Narx", "Avans", "Qarz", "Muddat", "Qabul sanasi", "Tayyor bo'lgan sana", "Izoh"];
     const rows = jobs.map((j) =>
-      [j.title, j.customer, (customers[j.customer] || {}).phone || "", STAGES[j.stage], j.parts, j.size === "katta" ? "Katta" : "Kichik", j.material, j.thick, j.dims, j.price, j.advance, debtOf(j), j.due, j.created, j.done, j.note]
+      [j.title, j.customer, (customers[j.customer] || {}).phone || "", STAGE_NAMES[j.stage], j.parts, j.area || 0, j.material, j.thick, j.dims, j.price, j.advance, debtOf(j), j.due, j.created, j.done, j.note]
         .map(q)
         .join(",")
     );

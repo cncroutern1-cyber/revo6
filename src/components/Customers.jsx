@@ -1,5 +1,5 @@
 import Page from "./Page.jsx";
-import { STAGES, fmt, debtOf } from "../utils.js";
+import { STAGE_NAMES, fmt, debtOf } from "../utils.js";
 
 export default function Customers({ jobs, customers, isAdmin, onPhone }) {
   const names = new Set(Object.keys(customers));
@@ -42,7 +42,7 @@ export default function Customers({ jobs, customers, isAdmin, onPhone }) {
                 ? "Ishlar yo'q"
                 : r.js.map((j) => (
                     <div key={j.id}>
-                      {j.title} ({STAGES[j.stage]})
+                      {j.title} ({STAGE_NAMES[j.stage]})
                     </div>
                   ))}
             </div>
