@@ -74,6 +74,9 @@ export default function Login() {
         backgroundSize: "auto, cover, 120px 120px",
       }}
     >
+      <a className="login-back" href="#">
+        ← {t("Bosh sahifaga")}
+      </a>
       <LangSwitch className="login-lang" />
       <form className="login-card" onSubmit={submit}>
         <h1>{t("Ish kuzatuv")}</h1>

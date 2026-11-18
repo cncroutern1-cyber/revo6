@@ -32,6 +32,7 @@ const D = {
   "To'langan": ["Оплачено", "Paid"],
   // Login
   "Mebel va naqsh ishlari hisobi. Davom etish uchun kiring.": ["Учёт мебельных и резных работ. Войдите, чтобы продолжить.", "Furniture and carving job tracking. Sign in to continue."],
+  "Bosh sahifaga": ["На главную", "Home"],
   "Foydalanuvchi": ["Пользователь", "User"],
   "Tanlang...": ["Выберите...", "Select..."],
   "Parol": ["Пароль", "Password"],
