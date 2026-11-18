@@ -85,7 +85,7 @@ const D = {
   "Xizmat narxi": ["Стоимость услуги", "Service price"],
   "Jami narx": ["Итого", "Total price"],
   "material": ["материал", "material"],
-  "PDF saqlash": ["Сохранить PDF", "Save PDF"],
+  "PDF yuklab olish": ["Скачать PDF", "Download PDF"],
   "Rover xizmati": ["Услуга Rover", "Rover service"],
   "bizdan": ["от нас", "ours"],
   "Qabul qilingan sana": ["Дата приёма", "Date received"],

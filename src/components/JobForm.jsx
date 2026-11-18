@@ -2,7 +2,7 @@ import { useState } from "react";
 import Modal from "./Modal.jsx";
 import { STAGE_NAMES, uid, todayStr, resizeImg, fmt, fmtArea } from "../utils.js";
 import { useT } from "../i18n.jsx";
-import { printJob } from "../pdf.js";
+import { downloadJobPdf } from "../pdf.js";
 
 const MATERIALS = ["LDSP", "MDF", "Massiv", "Fanera"];
 
@@ -94,7 +94,7 @@ export default function JobForm({ job, isAdmin, customers, onSave, onDelete, onC
       j = { ...j, stage, done: stage >= 3 ? j.done || todayStr() : "", pos: Date.now() };
     }
     onSave(j, f.phone.trim());
-    if (pdf === true) printJob(j, { t, isAdmin, phone: f.phone.trim() });
+    if (pdf === true) downloadJobPdf(j, { t, isAdmin, phone: f.phone.trim() });
   }
 
   return (
@@ -252,7 +252,7 @@ export default function JobForm({ job, isAdmin, customers, onSave, onDelete, onC
           {t("Bekor qilish")}
         </button>
         <button className="btn" onClick={() => submit(true)}>
-          {t("PDF saqlash")}
+          {t("PDF yuklab olish")}
         </button>
         <button className="btn primary" onClick={() => submit()}>
           {t("Saqlash")}
