@@ -52,3 +52,7 @@ create policy "sp_obj_read" on storage.objects for select to anon, authenticated
 create policy "sp_obj_insert" on storage.objects for insert to authenticated with check (bucket_id = 'site-products' and public.is_site_admin());
 create policy "sp_obj_update" on storage.objects for update to authenticated using (bucket_id = 'site-products' and public.is_site_admin());
 create policy "sp_obj_delete" on storage.objects for delete to authenticated using (bucket_id = 'site-products' and public.is_site_admin());
+
+-- Google bilan kirish uchun: ruxsat etilgan Google emaillarni shu yerga qo'shing (o'zingizning gmail manzilingiz):
+-- insert into public.site_admins (email) values ('sizning.manzilingiz@gmail.com') on conflict do nothing;
+grant execute on function public.is_site_admin() to authenticated;
